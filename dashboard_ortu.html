@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pantauan Orang Tua - SMP Yaspi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #0d6efd; --secondary: #495057; --success: #198754; --bg: #f1f3f5; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg); padding-bottom: 50px; }
+        
+        .header-panel { background: var(--primary); color: white; padding: 25px 20px; text-align: center; position: relative; border-radius: 0 0 15px 15px; }
+        .btn-keluar { position: absolute; right: 15px; top: 25px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        
+        .container { max-width: 600px; margin: 0 auto; width: 92%; }
+        
+        /* Kartu Profil Wali */
+        .info-card { background: white; margin: -15px auto 20px; border-radius: 10px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.08); border-left: 5px solid var(--primary); }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+        .info-label { color: #666; }
+        .info-value { font-weight: bold; color: #333; }
+
+        /* Kartu Skor Akumulasi */
+        .score-box { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .score-title { font-size: 14px; opacity: 0.8; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .score-val { font-size: 42px; font-weight: 800; margin: 5px 0; }
+        .score-footer { font-size: 12px; opacity: 0.7; }
+
+        /* Fitur Cari Tanggal */
+        .search-card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .search-title { font-size: 14px; font-weight: bold; color: #444; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .search-row { display: flex; gap: 10px; }
+        .input-date { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
+        .btn-cari { background: var(--success); color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-cari:hover { opacity: 0.9; }
+
+        /* Tampilan Log Sholat */
+        .log-section-title { font-size: 15px; font-weight: bold; color: #555; margin-bottom: 10px; text-align: left; }
+        .sholat-row { background: white; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .sholat-name { font-weight: bold; color: #222; font-size: 15px; }
+        .sholat-badge { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: bold; background: #e9ecef; color: #495057; }
+
+        /* Kategori Status Badge */
+        .status-berjamaah, .status-uzur { background: #d1e7dd; color: #0f5132; }
+        .status-awal { background: #cff4fc; color: #055160; }
+        .status-pertengahan { background: #fff3cd; color: #664d03; }
+        .status-akhir { background: #f8d7da; color: #842029; }
+        .status-kosong { background: #e2e3e5; color: #41464b; }
+
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; color: white; flex-direction: column; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="header-panel">
+    <h2>PANTALUAN ORANG TUA</h2>
+    <p style="font-size: 13px; opacity: 0.9; margin-top: 3px;">Monitoring Ibadah Ananda Realtime</p>
+    <button class="btn-keluar" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+</div>
+
+<div class="container">
+    <div class="info-card">
+        <div class="info-row"><span class="info-label">Akses Sistem :</span><span class="info-value" id="lbl-wali">Ortu -</span></div>
+        <div class="info-row"><span class="info-label">Nama Ananda :</span><span class="info-value" id="lbl-anak">-</span></div>
+    </div>
+
+    <div class="score-box">
+        <div class="score-title">Akumulasi Skor Sholat</div>
+        <div class="score-val" id="total-skor">0</div>
+        <div class="score-footer">Total poin terkumpul dari seluruh record harian</div>
+    </div>
+
+    <div class="search-card">
+        <div class="search-title"><i class="fas fa-calendar-alt" style="color: var(--primary);"></i> Lihat Riwayat Tanggal Lain</div>
+        <div class="search-row">
+            <input type="date" id="cari-tanggal" class="input-date">
+            <button class="btn-cari" onclick="loadRiwayatTanggal()"><i class="fas fa-search"></i> Cari</button>
+        </div>
+    </div>
+
+    <div class="log-section-title" id="judul-log">Laporan Sholat: Hari Ini</div>
+    <div id="wrapper-sholat">
+        <div class="sholat-row"><span class="sholat-name">Subuh</span><span class="sholat-badge">Memuat...</span></div>
+        <div class="sholat-row"><span class="sholat-name">Zuhur</span><span class="sholat-badge">Memuat...</span></div>
+        <div class="sholat-row"><span class="sholat-name">Asar</span><span class="sholat-badge">Memuat...</span></div>
+        <div class="sholat-row"><span class="sholat-name">Magrib</span><span class="sholat-badge">Memuat...</span></div>
+        <div class="sholat-row"><span class="sholat-name">Isya</span><span class="sholat-badge">Memuat...</span></div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="dashboard-loader">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px;"></i>
+    <span id="loader-text">Menarik data dari server pusat...</span>
+</div>
+
+<script>
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbxp5--kcFxG519l-XvIUULN8A_mXkqGk-0estP6x_ylMAti1q0KwPymlpzI4m4HlQfE/exec"; 
+    let sesiOrtu = JSON.parse(localStorage.getItem("user_tu"));
+
+    if (!sesiOrtu) { window.location.href = "index.html"; }
+
+    $(document).ready(function() {
+        // Set info header text
+        $("#lbl-wali").text(sesiOrtu.labelNama);
+        $("#lbl-anak").text(sesiOrtu.anak);
+        
+        // Set default date input ke hari ini
+        let hariIni = new Date().toISOString().split('T')[0];
+        $("#cari-tanggal").val(hariIni);
+
+        // Ambil data default pertama kali (Hari ini + Total akumulasi skor)
+        ambilDataServer(hariIni);
+    });
+
+    function ambilDataServer(tanggalTarget) {
+        $("#dashboard-loader").css("display", "flex");
+        
+        $.ajax({
+            url: URL_DATABASE,
+            type: "GET",
+            data: { 
+                action: "ambilLaporanOrtu", 
+                namaAnak: sesiOrtu.anak, 
+                tanggal: tanggalTarget 
+            },
+            dataType: "json",
+            success: function(res) {
+                $("#dashboard-loader").hide();
+                if (res && res.status === "success") {
+                    // 1. Tampilkan total akumulasi skor seluruh waktu ke kanan
+                    $("#total-skor").text(res.akumulasiSkor);
+                    
+                    // 2. Render status sholat tanggal terpilih
+                    renderDaftarSholat(res.dataSholat);
+                } else {
+                    alert("Gagal menarik data: " + res.message);
+                }
+            },
+            error: function() {
+                $("#dashboard-loader").hide();
+                alert("Gangguan jaringan. Gagal sinkronisasi data.");
+            }
+        });
+    }
+
+    function renderDaftarSholat(dataSholat) {
+        let htmlContent = "";
+        const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
+
+        listWaktu.forEach(waktu => {
+            let poinStr = String(dataSholat[waktu]).trim();
+            let teksStatus = "Belum Diisi / Lewat Waktu";
+            let classBadge = "status-kosong";
+
+            // Deteksi teks status berdasarkan nilai poin angka di database sheet
+            if (poinStr === "20") {
+                teksStatus = "Berjamaah / Uzur (20 Poin)";
+                classBadge = "status-berjamaah";
+            } else if (poinStr === "15") {
+                teksStatus = "Awal Waktu (15 Poin)";
+                classBadge = "status-awal";
+            } else if (poinStr === "10") {
+                teksStatus = "Pertengahan Waktu (10 Poin)";
+                classBadge = "status-pertengahan";
+            } else if (poinStr === "5") {
+                teksStatus = "Akhir Waktu (5 Poin)";
+                classBadge = "status-akhir";
+            }
+
+            htmlContent += `
+                <div class="sholat-row">
+                    <span class="sholat-name">${waktu}</span>
+                    <span class="sholat-badge ${classBadge}">${teksStatus}</span>
+                </div>
+            `;
+        });
+
+        $("#wrapper-sholat").html(htmlContent);
+    }
+
+    function loadRiwayatTanggal() {
+        let tglDipilih = $("#cari-tanggal").val();
+        if (!tglDipilih) {
+            alert("Silakan pilih tanggal terlebih dahulu!");
+            return;
+        }
+        
+        // Ubah judul log section
+        let opsiFormat = { day: 'numeric', month: 'long', year: 'numeric' };
+        let tglFormatIndo = new Date(tglDipilih).toLocaleDateString('id-ID', opsiFormat);
+        $("#judul-log").text("Laporan Sholat: Tanggal " + tglFormatIndo);
+
+        // Tarik data tanggal tersebut ke server
+        ambilDataServer(tglDipilih);
+    }
+
+    function logout() {
+        localStorage.removeItem("user_tu");
+        window.location.href = "index.html";
+    }
+</script>
+</body>
+</html>
