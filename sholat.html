@@ -55,10 +55,12 @@
 
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbzE-c7kUbnECWa4daQ4vrJfSQhzpU3awqjb8BRXt5szPmNV842nQTmcuYri0cwHnUUU/exec";
+    // Cek baris ini di sholat.html Bapak
     let sesiSiswa = JSON.parse(localStorage.getItem("user_sholat"));
 
-    if (!sesiSiswa) { window.location.href = "index.html"; }
-
+    if (!sesiSiswa || sesiSiswa.role !== "siswa") { 
+        window.location.href = "index.html"; 
+    }
     var rincianPilihan = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
 
     $(document).ready(function() {
