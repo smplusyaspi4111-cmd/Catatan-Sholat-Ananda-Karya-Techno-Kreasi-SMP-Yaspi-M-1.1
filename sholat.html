@@ -186,16 +186,15 @@
         $("#sholat-loader").css("display", "flex");
         $("#loader-text").text("Mengunci poin ibadahmu di server...");
 
-        // Kirim bundling data menuju backend Google Script
+        // UBAH BAGIAN INI DI FILE SHOLAT.HTML BAPAK
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
             data: {
-                action: "simpanDataSiswaBaru", // Fungsi pendaftaran / update record baris
+                action: "simpanPoinSholat", // Ubah kesini agar tidak dikira daftar akun baru
                 nama: sesiSiswa.nama,
                 jk: sesiSiswa.jk,
                 passAnak: sesiSiswa.passAnak,
-                passOrtu: "123456", // Default fallback pendamping password ortu
                 rincianPoin: JSON.stringify(rincianPilihan),
                 tanggal: hariIni
             },
