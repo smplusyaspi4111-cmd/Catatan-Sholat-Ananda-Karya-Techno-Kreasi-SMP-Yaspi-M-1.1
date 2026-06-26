@@ -96,21 +96,25 @@
 </div>
 
 <script>
+    // GANTI BAGIAN KODE INI DI DASHBOARD_ORTU.HTML
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbzE-c7kUbnECWa4daQ4vrJfSQhzpU3awqjb8BRXt5szPmNV842nQTmcuYri0cwHnUUU/exec"; 
-    let sesiOrtu = JSON.parse(localStorage.getItem("user_tu"));
+    
+    // Pastikan mengambil "user_ortu" (bukan user_tu)
+    let sesiOrtu = JSON.parse(localStorage.getItem("user_ortu")); 
 
-    if (!sesiOrtu) { window.location.href = "index.html"; }
+    // Jika sesi tidak ditemukan, kembalikan ke index.html
+    if (!sesiOrtu) { 
+        window.location.href = "index.html"; 
+    }
 
     $(document).ready(function() {
-        // Set info header text
-        $("#lbl-wali").text(sesiOrtu.labelNama);
-        $("#lbl-anak").text(sesiOrtu.anak);
+        // Sesuaikan variabelnya menjadi sesiOrtu.namaAnak
+        $("#lbl-wali").text("Orang Tua");
+        $("#lbl-anak").text(sesiOrtu.namaAnak);
         
-        // Set default date input ke hari ini
         let hariIni = new Date().toISOString().split('T')[0];
         $("#cari-tanggal").val(hariIni);
 
-        // Ambil data default pertama kali (Hari ini + Total akumulasi skor)
         ambilDataServer(hariIni);
     });
 
