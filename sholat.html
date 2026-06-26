@@ -3,148 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Sholat Digital Santri</title>
+    <title>Jurnal Sholat Mandiri</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #0f5132; --secondary: #198754; --bg: #f1f3f5; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg); padding-bottom: 40px; }
-        .header-siswa { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 15px 15px; position: relative; }
-        .btn-logout { position: absolute; left: 15px; top: 20px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-        .container { max-width: 450px; margin: 0 auto; width: 92%; }
-        .profil-card { background: white; margin: -15px auto 20px; border-radius: 12px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 15px; }
-        .avatar-box { width: 50px; height: 50px; border-radius: 50%; background: #e8f5e9; color: var(--primary); display: flex; justify-content: center; align-items: center; font-size: 22px; }
-        .sholat-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 3px 6px rgba(0,0,0,0.03); }
-        .sholat-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
-        .opsi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-opsi { padding: 12px 8px; border: 2px solid #e9ecef; background: #f8f9fa; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        
-        /* WARNA BARU TOMBOL OPSI */
-        .btn-opsi.active-berjamaah { background: #d1e7dd; border-color: #0f5132; color: #0f5132; }
-        .btn-opsi.active-awal { background: #cff4fc; border-color: #055160; color: #055160; }
-        .btn-opsi.active-tengah { background: #fff3cd; border-color: #664d03; color: #664d03; }
-        .btn-opsi.active-akhir { background: #f8d7da; border-color: #842029; color: #842029; }
-        .btn-opsi.active-uzur { background: #e2e3e5; border-color: #6c757d; color: #383d41; } /* ABU ABU UZUR */
-        
-        .btn-simpan-all { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; color: white; flex-direction: column; }
+        :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: var(--bg); padding-bottom: 40px; }
+        .header-app { background: var(--primary); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-out { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .container { max-width: 450px; margin: 20px auto; width: 92%; }
+        .waktu-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); }
+        .waktu-title { font-weight: bold; color: #333; margin-bottom: 10px; font-size: 15px; border-left: 4px solid var(--primary); padding-left: 8px; }
+        .opsi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-opsi { padding: 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: left; transition: 0.2s; }
+        .btn-opsi.selected { background: #e8f5e9; border-color: var(--secondary); color: var(--primary); font-weight: bold; }
+        .btn-simpan-all { width: 100%; padding: 14px; background: var(--secondary); color: white; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header-siswa">
-    <button class="btn-logout" onclick="logoutSiswa()"><i class="fas fa-arrow-left"></i> Keluar</button>
-    <h2>JURNAL SHOLAT</h2>
-    <p style="font-size: 12px; opacity: 0.9;">Kunci Nilai Amalan Ibadahmu Hari Ini</p>
+<div class="header-app">
+    <span id="nama-user-display">Santri</span>
+    <button class="btn-out" onclick="logoutSiswa()">Keluar</button>
 </div>
 
 <div class="container">
-    <div class="profil-card">
-        <div class="avatar-box" id="avatar-gender"><i class="fas fa-user-graduate"></i></div>
-        <div class="profil-info">
-            <h4 id="nama-display">Nama Santri</h4>
-            <p id="jk-display">Jenis Kelamin: -</p>
-        </div>
-    </div>
-    <div id="container-jurnal"></div>
+    <div id="box-sholat"></div>
     <button class="btn-simpan-all" onclick="kirimSemuaJurnal()"><i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server</button>
 </div>
 
-<div class="loader-overlay" id="sholat-loader">
-    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px;"></i>
-    <span>Mengunci poin ibadahmu di server...</span>
+<div class="loader" id="sholat-loader">
+    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Mengunci poin ibadahmu di server...</div>
 </div>
 
 <script>
-    // MASUKKAN URL WEB APP GOOGLE SCRIPT BARU BAPAK DI SINI
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbx0Go2RttBdI0rhYu8ncMtAWYiChAn4V8yaYICn_SBs5JdFGlc1y2H-dxOsYjVqLTEl/exec"; 
-    let sesiSiswa = JSON.parse(localStorage.getItem("user_sholat"));
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbwxq3cJwA62--YLcBS8K3yayFWa42MW9mJAv_KS2eiWeKWSBGHJQWWZzMmLtgwg0z7Q/exec";
+    let sesiSiswa = JSON.parse(localStorage.getItem("user_siswa"));
+    if(!sesiSiswa || sesiSiswa.role !== "siswa") { window.location.href = "index.html"; }
 
-    if (!sesiSiswa) { window.location.href = "index.html"; }
-
-    var rincianPilihan = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
+    const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
+    const daftarPilihan = [
+        { teks: "Berjamaah / Tepat", poin: 20 },
+        { teks: "Awal Waktu", poin: 15 },
+        { teks: "Tengah Waktu", poin: 10 },
+        { teks: "Akhir Waktu", poin: 5 }
+    ];
+    let rincianPilihan = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
 
     $(document).ready(function() {
-        $("#nama-display").text(sesiSiswa.nama);
-        $("#jk-display").text("Jenis Kelamin: " + (sesiSiswa.jk === "L" ? "Laki-laki" : "Perempuan"));
-        if(sesiSiswa.jk === "P") {
-            $("#avatar-gender").html('<i class="fas fa-user-nurse"></i>').css("background", "#fce4ec").css("color", "#c2185b");
-        }
-        bikinFormSholat();
+        $("#nama-user-display").text("Santri: " + sesiSiswa.nama);
+        buildFormSholat();
     });
 
-    function bikinFormSholat() {
-        const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
+    function buildFormSholat() {
         let html = "";
         listWaktu.forEach(w => {
-            html += `
-                <div class="sholat-card" id="card-${w}">
-                    <div class="sholat-title">Sholat ${w}</div>
-                    <div class="opsi-grid">
-                        ${sesiSiswa.jk === 'L' ? 
-                        `<button class="btn-opsi" id="btn-${w}-20" onclick="pilihOpsi('${w}', 20, 'berjamaah')"><i class="fas fa-users"></i> Berjamaah (20)</button>` : 
-                        `<button class="btn-opsi" id="btn-${w}-20" onclick="pilihOpsi('${w}', 20, 'uzur')"><i class="fas fa-calendar-times"></i> Uzur/Haid (20)</button>`}
-                        <button class="btn-opsi" id="btn-${w}-15" onclick="pilihOpsi('${w}', 15, 'awal')"><i class="fas fa-stopwatch"></i> Awal Waktu (15)</button>
-                        <button class="btn-opsi" id="btn-${w}-10" onclick="pilihOpsi('${w}', 10, 'tengah')"><i class="fas fa-hourglass-half"></i> Tengah Waktu (10)</button>
-                        <button class="btn-opsi" id="btn-${w}-5" onclick="pilihOpsi('${w}', 5, 'akhir')"><i class="fas fa-history"></i> Akhir Waktu (5)</button>
-                    </div>
-                </div>`;
+            html += `<div class="waktu-card"><div class="waktu-title">Sholat ${w}</div><div class="opsi-grid">`;
+            daftarPilihan.forEach(p => {
+                html += `<button class="btn-opsi" data-waktu="${w}" data-poin="${p.poin}" onclick="pilihOpsi(this)">${p.teks} (+${p.poin})</button>`;
+            });
+            html += `</div></div>`;
         });
-        $("#container-jurnal").html(html);
+        $("#box-sholat").html(html);
     }
 
-    function pilihOpsi(waktu, poin, tipeKelas) {
-        $(`#card-${waktu} .btn-opsi`).removeClass("active-berjamaah active-awal active-tengah active-akhir active-uzur");
-        $(`#btn-${waktu}-${poin}`).addClass("active-" + tipeKelas);
+    function pilihOpsi(btn) {
+        let waktu = $(btn).data("waktu");
+        let poin = parseInt($(btn).data("poin"));
+        $(`button[data-waktu="${waktu}"]`).removeClass("selected");
+        $(btn).addClass("selected");
         rincianPilihan[waktu] = poin;
-        if (tipeKelas === 'uzur' && 'speechSynthesis' in window) {
-            let ucapan = new SpeechSynthesisUtterance("Anda memilih uzur harian.");
-            ucapan.lang = "id-ID"; window.speechSynthesis.speak(ucapan);
-        }
     }
 
     function kirimSemuaJurnal() {
-        // 1. Membuat format Tanggal + Nama Hari (Contoh: Sabtu, 27-06-2026)
-        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-        let tanggalDanHari = new Date().toLocaleDateString('id-ID', opsiHari); 
-        // Mengubah tanda koma/spasi bawaan browser agar seragam rapi
-        tanggalDanHari = tanggalDanHari.replace(/,/g, '').replace(/\//g, '-'); 
-
+        let tombolSimpan = $(".btn-simpan-all");
+        // Kunci tombol agar anti-klik ganda
+        tombolSimpan.prop("disabled", true).css("opacity", "0.5").text("Sedang Mengunci Poin...");
         $("#sholat-loader").css("display", "flex");
 
-        // 2. Menghitung Total Nilai secara Mandiri di Web
-        let totalSkorSiswa = rincianPilihan["Subuh"] + rincianPilihan["Zuhur"] + rincianPilihan["Asar"] + rincianPilihan["Magrib"] + rincianPilihan["Isya"];
+        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+        let tanggalDanHari = new Date().toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-'); 
 
-        // 3. Merakit format teks baru dengan total nilai di ujungnya
+        let totalSkorSiswa = rincianPilihan["Subuh"] + rincianPilihan["Zuhur"] + rincianPilihan["Asar"] + rincianPilihan["Magrib"] + rincianPilihan["Isya"];
         let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"] + " [Total: " + totalSkorSiswa + " Poin]";
 
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
-            data: {
-                action: "simpanPoinSholat",
-                nama: sesiSiswa.nama,
-                tanggal: tanggalDanHari, // Mengirim format tanggal + hari baru ke kolom header G1
-                rincianPoin: teksFormatSheet // Mengirim format teks + total skor ke sel G2
-            },
+            data: { action: "simpanPoinSholat", nama: sesiSiswa.nama, tanggal: tanggalDanHari, rincianPoin: teksFormatSheet },
             dataType: "json",
             success: function(res) {
                 $("#sholat-loader").hide();
-                if(res.status === "success") { 
-                    alert("Alhamdulillah, jurnal sholat sukses tersimpan!"); 
-                }
+                tombolSimpan.prop("disabled", false).css("opacity", "1").html('<i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server');
+                if(res.status === "success") { alert("Alhamdulillah, jurnal sholat sukses tersimpan!"); }
             },
             error: function() { 
                 $("#sholat-loader").hide(); 
-                alert("Koneksi gagal."); 
+                tombolSimpan.prop("disabled", false).css("opacity", "1").html('<i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server');
+                alert("Koneksi bermasalah saat menyimpan."); 
             }
         });
     }
 
-    function logoutSiswa() {
-        if(confirm("Keluar dari halaman ini?")) { localStorage.removeItem("user_sholat"); window.location.href = "index.html"; }
-    }
+    function logoutSiswa() { localStorage.removeItem("user_siswa"); window.location.href = "index.html"; }
 </script>
 </body>
 </html>
