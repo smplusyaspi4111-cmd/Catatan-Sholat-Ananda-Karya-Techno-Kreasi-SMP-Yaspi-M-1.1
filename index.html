@@ -3,213 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Sholat Digital - Gates</title>
+    <title>Jurnal Sholat Digital - SMP Yaspi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .login-box { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-top: 5px solid var(--primary); }
-        .logo-area { text-align: center; margin-bottom: 25px; }
-        .logo-area i { font-size: 45px; color: var(--primary); }
-        .logo-area h3 { margin-top: 10px; color: #333; font-size: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #eee; padding: 5px; border-radius: 8px; }
-        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; color: #666; transition: 0.2s; }
-        .tab.active { background: var(--primary); color: white; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #444; }
+        .login-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
+        .logo-area { color: var(--primary); font-size: 45px; margin-bottom: 10px; }
+        .app-title { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 25px; }
+        .tabs { display: flex; background: #e9ecef; padding: 4px; border-radius: 8px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #6c757d; cursor: pointer; border-radius: 6px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
-        .form-group input:focus { border-color: var(--primary); }
-        .gender-box { display: flex; gap: 15px; margin-top: 5px; }
-        .gender-opt { display: flex; align-items: center; gap: 5px; font-size: 14px; }
-        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-submit:hover { background: #0b3d26; }
-        .btn-register { width: 100%; background: #ffffff; color: var(--secondary); border: 2px dashed var(--secondary); padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: 0.2s; }
-        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; flex-direction: column; font-size: 14px; }
+        .btn-submit { width: 100%; padding: 12px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 15px; margin-top: 10px; }
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<div class="login-box">
-    <div class="logo-area">
-        <i class="fas fa-mosque"></i>
-        <h3>Jurnal Sholat Digital</h3>
-    </div>
-
+<div class="login-card">
+    <div class="logo-area"><i class="fas fa-mosque"></i></div>
+    <div class="app-title">Jurnal Sholat Digital</div>
+    
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('siswa')">Menu Santri</div>
-        <div class="tab" onclick="switchTab('ortu')">Orang Tua</div>
+        <button class="tab-btn active" onclick="gantiTab('santri')">Menu Santri</button>
+        <button class="tab-btn" onclick="gantiTab('ortu')">Orang Tua</button>
     </div>
 
-    <div id="panel-siswa">
+    <div id="form-santri">
         <div class="form-group">
-            <label>Nama Lengkap Ananda</label>
-            <input type="text" id="siswa-nama" placeholder="Contoh: Syafia">
-        </div>
-        <div class="form-group" id="box-jk-daftar" style="display:none; background:#f0f7f4; padding:10px; border-radius:8px;">
-            <label style="color:var(--primary)">Pilih Jenis Kelamin (Hanya untuk Pendaftaran Akun)</label>
-            <div class="gender-box">
-                <label class="gender-opt"><input type="radio" name="siswa-jk" value="L"> Laki-laki</label>
-                <label class="gender-opt"><input type="radio" name="siswa-jk" value="P"> Perempuan</label>
-            </div>
+            <label>Nama Lengkap Ananda (Harus Unik)</label>
+            <input type="text" id="nama-santri" placeholder="Contoh: Syafia">
         </div>
         <div class="form-group">
             <label>Password Akun Anak</label>
-            <input type="password" id="siswa-pass" placeholder="Masukkan password akun">
+            <input type="password" id="pass-santri" placeholder="••••">
         </div>
-        
-        <button class="btn-submit" id="btn-login-siswa" onclick="prosesLoginSiswa()">Masuk Jurnal (Login)</button>
-        <button class="btn-register" id="btn-view-daftar" onclick="bukaFormPendaftaran()">Belum Punya Akun? Daftar Baru</button>
-        <button class="btn-submit" id="btn-eksekusi-daftar" onclick="prosesDaftarSiswaBaru()" style="display:none; background:#198754;">Konfirmasi Pendaftaran Baru</button>
+        <button class="btn-submit" onclick="prosesLoginSantri()">Masuk / Daftar Jurnal</button>
     </div>
 
-    <div id="panel-ortu" style="display: none;">
+    <div id="form-ortu" style="display: none;">
         <div class="form-group">
-            <label>Nama Lengkap Santri</label>
-            <input type="text" id="ortu-anak" placeholder="Tulis nama anak Anda">
+            <label>Nama Lengkap Ananda</label>
+            <input type="text" id="nama-anak-ortu" placeholder="Contoh: Syafia">
         </div>
         <div class="form-group">
-            <label>Password Khusus Orang Tua</label>
-            <input type="password" id="ortu-pass" placeholder="Masukkan password wali murid">
+            <label>Password Akun Orang Tua</label>
+            <input type="password" id="pass-ortu" placeholder="••••••">
         </div>
-        <button class="btn-submit" onclick="prosesLoginOrtu()">Masuk Pantauan</button>
+        <button class="btn-submit" style="background: var(--secondary);" onclick="prosesLoginOrtu()">Pantau Jurnal Anak</button>
     </div>
 </div>
 
-<div class="loader-overlay" id="main-loader">
-    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom:10px;"></i>
-    <span id="loader-text">Memproses data...</span>
+<div class="loader-overlay" id="loading">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px;"></i>
+    <span id="load-text">Memeriksa data...</span>
 </div>
 
 <script>
-    // MASUKKAN URL WEB APP GOOGLE SCRIPT BARU BAPAK DI SINI
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbx0Go2RttBdI0rhYu8ncMtAWYiChAn4V8yaYICn_SBs5JdFGlc1y2H-dxOsYjVqLTEl/exec"; 
+    // Taruh URL Google Web App (/exec) Bapak di bawah ini
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbwxq3cJwA62--YLcBS8K3yayFWa42MW9mJAv_KS2eiWeKWSBGHJQWWZzMmLtgwg0z7Q/exec";
 
-    function switchTab(role) {
-        $(".tab").removeClass("active");
-        resetFormSiswa();
-        if(role === 'siswa') {
-            $("[onclick*='siswa']").addClass("active");
-            $("#panel-siswa").show(); $("#panel-ortu").hide();
+    function gantiTab(tipe) {
+        $(".tab-btn").removeClass("active");
+        if(tipe === 'santri') {
+            $(".tab-btn").eq(0).addClass("active");
+            $("#form-santri").show(); $("#form-ortu").hide();
         } else {
-            $("[onclick*='ortu']").addClass("active");
-            $("#panel-siswa").hide(); $("#panel-ortu").show();
+            $(".tab-btn").eq(1).addClass("active");
+            $("#form-santri").hide(); $("#form-ortu").show();
         }
     }
 
-    function bukaFormPendaftaran() {
-        $("#box-jk-daftar").slideDown();
-        $("#btn-login-siswa").hide();
-        $("#btn-view-daftar").hide();
-        $("#btn-eksekusi-daftar").show();
-    }
+    function prosesLoginSantri() {
+        let nama = $("#nama-santri").val().trim();
+        let pass = $("#pass-santri").val().trim();
+        if(!nama || !pass) { alert("Nama dan password anak harus diisi!"); return; }
 
-    function resetFormSiswa() {
-        $("#box-jk-daftar").hide();
-        $("#btn-login-siswa").show();
-        $("#btn-view-daftar").show();
-        $("#btn-eksekusi-daftar").hide();
-    }
-
-    // FUNGSI UTAMA 1: LOGIN SISWA (BISA BERULANG KALI)
-    function prosesLoginSiswa() {
-        let nama = $("#siswa-nama").val().trim();
-        let pass = $("#siswa-pass").val().trim();
-
-        if(!nama || !pass) { alert("Harap isi Nama dan Password anak!"); return; }
-
-        $("#main-loader").css("display", "flex");
-        $("#loader-text").text("Memverifikasi data masuk santri...");
-
+        $("#loading").css("display", "flex");
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
-            data: { action: "loginSiswaNew", nama: nama, passAnak: pass },
+            data: { action: "loginSiswa", nama: nama, password: pass },
             dataType: "json",
             success: function(res) {
-                $("#main-loader").hide();
+                $("#loading").hide();
                 if(res.status === "success") {
-                    let sesi = { role: "siswa", nama: res.nama, jk: res.jk, passAnak: res.passAnak };
-                    localStorage.setItem("user_sholat", JSON.stringify(sesi));
+                    localStorage.setItem("user_siswa", JSON.stringify({ role: "siswa", nama: res.nama }));
                     window.location.href = "sholat.html";
-                } else {
-                    alert(res.message);
-                }
+                } else { alert(res.message); }
             },
-            error: function() { $("#main-loader").hide(); alert("Gagal terhubung ke database."); }
-        });
-    }
-
-    // FUNGSI UTAMA 2: DAFTAR AKUN BARU (HANYA SEKALI DI AWAL)
-    function prosesDaftarSiswaBaru() {
-        let nama = $("#siswa-nama").val().trim();
-        let jk = $("input[name='siswa-jk']:checked").val();
-        let pass = $("#siswa-pass").val().trim();
-
-        if(!nama || !jk || !pass) { alert("Harap isi Nama, Jenis Kelamin, dan Password untuk mendaftar!"); return; }
-
-        $("#main-loader").css("display", "flex");
-        $("#loader-text").text("Memeriksa sistem nama unik...");
-
-        $.ajax({
-            url: URL_DATABASE,
-            type: "GET",
-            data: { action: "cekNamaUnik", nama: nama },
-            dataType: "json",
-            success: function(res) {
-                if (res.status === "exists") {
-                    $("#main-loader").hide();
-                    alert(res.message);
-                } else {
-                    $("#loader-text").text("Membuat kunci akun baru...");
-                    let passOrtu = prompt("Buat 1 Password khusus untuk Orang Tua memantau nanti:", "123456");
-                    if(!passOrtu) { $("#main-loader").hide(); return; }
-
-                    $.ajax({
-                        url: URL_DATABASE,
-                        type: "GET",
-                        data: { action: "simpanDataSiswaBaru", nama: nama, jk: jk, passAnak: pass, passOrtu: passOrtu },
-                        dataType: "json",
-                        success: function(saveRes) {
-                            $("#main-loader").hide();
-                            if(saveRes.status === "success") {
-                                alert("Akun berhasil dibuat! Silakan langsung klik tombol LOGIN.");
-                                resetFormSiswa();
-                            }
-                        }
-                    });
-                }
-            },
-            error: function() { $("#main-loader").hide(); alert("Koneksi internet bermasalah."); }
+            error: function() { $("#loading").hide(); alert("Koneksi gagal, periksa web app Anda."); }
         });
     }
 
     function prosesLoginOrtu() {
-        let namaAnak = $("#ortu-anak").val().trim();
-        let passOrtu = $("#ortu-pass").val().trim();
+        let namaAnak = $("#nama-anak-ortu").val().trim();
+        let passOrtu = $("#pass-ortu").val().trim();
+        if(!namaAnak || !passOrtu) { alert("Nama anak dan password ortu wajib diisi!"); return; }
 
-        if(!namaAnak || !passOrtu) { alert("Harap isi nama anak dan password!"); return; }
-
-        $("#main-loader").css("display", "flex");
-        $("#loader-text").text("Memverifikasi password wali...");
-
+        $("#loading").css("display", "flex");
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
-            data: { action: "loginOrtuNew", namaAnak: namaAnak, passOrtu: passOrtu },
+            data: { action: "loginOrtu", namaAnak: namaAnak, passwordOrtu: passOrtu },
             dataType: "json",
             success: function(res) {
-                $("#main-loader").hide();
+                $("#loading").hide();
                 if(res.status === "success") {
-                    let sesiOrtu = { role: "ortu", namaAnak: res.namaAnak };
-                    localStorage.setItem("user_ortu", JSON.stringify(sesiOrtu));
+                    localStorage.setItem("user_ortu", JSON.stringify({ role: "ortu", namaAnak: res.namaAnak }));
                     window.location.href = "dashboard_ortu.html";
-                } else {
-                    alert(res.message);
-                }
+                } else { alert(res.message); }
             },
-            error: function() { $("#main-loader").hide(); alert("Koneksi gagal."); }
+            error: function() { $("#loading").hide(); alert("Gagal terhubung ke database server orang tua."); }
         });
     }
 </script>
