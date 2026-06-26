@@ -66,7 +66,7 @@
 </div>
 
 <script>
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbwxq3cJwA62--YLcBS8K3yayFWa42MW9mJAv_KS2eiWeKWSBGHJQWWZzMmLtgwg0z7Q/exec";
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbxUP8rd3y-P1tRi_81edvCKUvz-dqwnLgY6lYHFFiu0PbrY6LRnFBQlOfAkxZ4tebu6/exec";
     
     let sesiOrtu = JSON.parse(localStorage.getItem("user_ortu"));
     if (!sesiOrtu || sesiOrtu.role !== "ortu") { window.location.href = "index.html"; }
@@ -81,30 +81,35 @@
     });
 
     function loadDataLaporanOrtu() {
-        let tanggalMentah = $("#input-tanggal-cari").val();
-        if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
+    let tanggalMentah = $("#input-tanggal-cari").val();
+    if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
 
-        let d = new Date(tanggalMentah);
-        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-        let tanggalTargetFormat = d.toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-');
+    let d = new Date(tanggalMentah);
+    let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+    let tanggalTargetFormat = d.toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-');
 
-        $("#loader-ortu").css("display", "flex");
+    $("#loader-ortu").css("display", "flex");
 
-        $.ajax({
-            url: URL_DATABASE,
-            type: "GET",
-            data: { action: "ambilLaporanOrtu", namaAnak: sesiOrtu.namaAnak, tanggal: tanggalTargetFormat },
-            dataType: "json",
-            success: function(res) {
-                $("#loader-ortu").hide();
-                if (res.status === "success") {
-                    $("#total-skor-display").text(res.akumulasiSkor);
-                    renderTabelLaporan(res.dataSholat);
-                } else { alert(res.message); }
-            },
-            error: function() { $("#loader-ortu").hide(); alert("Gagal mengunduh data dari server."); }
-        });
-    }
+    // MENGGUNAKAN TEKNIK JSONP UNTUK MENEMBUS BLOKIRAN INTERNET BROWSER
+    $.ajax({
+        url: URL_DATABASE,
+        type: "GET",
+        data: { action: "ambilLaporanOrtu", namaAnak: sesiOrtu.namaAnak, tanggal: tanggalTargetFormat },
+        dataType: "jsonp", // <--- KUNCI UTAMA: Wajib diubah menjadi jsonp
+        jsonp: "callback", // <--- Ditambahkan agar dibaca fungsi Apps Script baru
+        success: function(res) {
+            $("#loader-ortu").hide();
+            if (res.status === "success") {
+                $("#total-skor-display").text(res.akumulasiSkor);
+                renderTabelLaporan(res.dataSholat);
+            } else { alert(res.message); }
+        },
+        error: function() { 
+            $("#loader-ortu").hide(); 
+            alert("Gagal mengunduh data dari server. Mohon pastikan deployment Web App Anda sudah diset ke 'Anyone'."); 
+        }
+    });
+}
 
     function renderTabelLaporan(dataSholat) {
         const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
