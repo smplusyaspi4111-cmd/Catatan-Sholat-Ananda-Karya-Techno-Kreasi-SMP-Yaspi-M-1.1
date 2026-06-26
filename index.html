@@ -19,12 +19,13 @@
         .tab.active { background: var(--primary); color: white; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #444; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
         .form-group input:focus { border-color: var(--primary); }
         .gender-box { display: flex; gap: 15px; margin-top: 5px; }
         .gender-opt { display: flex; align-items: center; gap: 5px; font-size: 14px; }
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         .btn-submit:hover { background: #0b3d26; }
+        .btn-register { width: 100%; background: #ffffff; color: var(--secondary); border: 2px dashed var(--secondary); padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 12px; transition: 0.2s; }
         .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; flex-direction: column; font-size: 14px; }
     </style>
 </head>
@@ -43,11 +44,11 @@
 
     <div id="panel-siswa">
         <div class="form-group">
-            <label>Nama Lengkap Ananda (Harus Unik)</label>
-            <input type="text" id="siswa-nama" placeholder="Contoh: Syafia Ahmad">
+            <label>Nama Lengkap Ananda</label>
+            <input type="text" id="siswa-nama" placeholder="Contoh: Syafia">
         </div>
-        <div class="form-group">
-            <label>Jenis Kelamin</label>
+        <div class="form-group" id="box-jk-daftar" style="display:none; background:#f0f7f4; padding:10px; border-radius:8px;">
+            <label style="color:var(--primary)">Pilih Jenis Kelamin (Hanya untuk Pendaftaran Akun)</label>
             <div class="gender-box">
                 <label class="gender-opt"><input type="radio" name="siswa-jk" value="L"> Laki-laki</label>
                 <label class="gender-opt"><input type="radio" name="siswa-jk" value="P"> Perempuan</label>
@@ -55,9 +56,12 @@
         </div>
         <div class="form-group">
             <label>Password Akun Anak</label>
-            <input type="password" id="siswa-pass" placeholder="Buat password bebas">
+            <input type="password" id="siswa-pass" placeholder="Masukkan password akun">
         </div>
-        <button class="btn-submit" onclick="prosesMasukSiswa()">Masuk / Daftar Jurnal</button>
+        
+        <button class="btn-submit" id="btn-login-siswa" onclick="prosesLoginSiswa()">Masuk Jurnal (Login)</button>
+        <button class="btn-register" id="btn-view-daftar" onclick="bukaFormPendaftaran()">Belum Punya Akun? Daftar Baru</button>
+        <button class="btn-submit" id="btn-eksekusi-daftar" onclick="prosesDaftarSiswaBaru()" style="display:none; background:#198754;">Konfirmasi Pendaftaran Baru</button>
     </div>
 
     <div id="panel-ortu" style="display: none;">
@@ -79,10 +83,12 @@
 </div>
 
 <script>
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbzE-c7kUbnECWa4daQ4vrJfSQhzpU3awqjb8BRXt5szPmNV842nQTmcuYri0cwHnUUU/exec";
+    // MASUKKAN URL WEB APP GOOGLE SCRIPT BARU BAPAK DI SINI
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbz1gT-x00RPlL8P5qUvC4gE-P70Yy_vI42kE_BAPAK/exec"; 
 
     function switchTab(role) {
         $(".tab").removeClass("active");
+        resetFormSiswa();
         if(role === 'siswa') {
             $("[onclick*='siswa']").addClass("active");
             $("#panel-siswa").show(); $("#panel-ortu").hide();
@@ -92,17 +98,60 @@
         }
     }
 
-    function prosesMasukSiswa() {
+    function bukaFormPendaftaran() {
+        $("#box-jk-daftar").slideDown();
+        $("#btn-login-siswa").hide();
+        $("#btn-view-daftar").hide();
+        $("#btn-eksekusi-daftar").show();
+    }
+
+    function resetFormSiswa() {
+        $("#box-jk-daftar").hide();
+        $("#btn-login-siswa").show();
+        $("#btn-view-daftar").show();
+        $("#btn-eksekusi-daftar").hide();
+    }
+
+    // FUNGSI UTAMA 1: LOGIN SISWA (BISA BERULANG KALI)
+    function prosesLoginSiswa() {
+        let nama = $("#siswa-nama").val().trim();
+        let pass = $("#siswa-pass").val().trim();
+
+        if(!nama || !pass) { alert("Harap isi Nama dan Password anak!"); return; }
+
+        $("#main-loader").css("display", "flex");
+        $("#loader-text").text("Memverifikasi data masuk santri...");
+
+        $.ajax({
+            url: URL_DATABASE,
+            type: "GET",
+            data: { action: "loginSiswaNew", nama: nama, passAnak: pass },
+            dataType: "json",
+            success: function(res) {
+                $("#main-loader").hide();
+                if(res.status === "success") {
+                    let sesi = { role: "siswa", nama: res.nama, jk: res.jk, passAnak: res.passAnak };
+                    localStorage.setItem("user_sholat", JSON.stringify(sesi));
+                    window.location.href = "sholat.html";
+                } else {
+                    alert(res.message);
+                }
+            },
+            error: function() { $("#main-loader").hide(); alert("Gagal terhubung ke database."); }
+        });
+    }
+
+    // FUNGSI UTAMA 2: DAFTAR AKUN BARU (HANYA SEKALI DI AWAL)
+    function prosesDaftarSiswaBaru() {
         let nama = $("#siswa-nama").val().trim();
         let jk = $("input[name='siswa-jk']:checked").val();
         let pass = $("#siswa-pass").val().trim();
 
-        if(!nama || !jk || !pass) { alert("Harap lengkapi semua bidang isian anak!"); return; }
+        if(!nama || !jk || !pass) { alert("Harap isi Nama, Jenis Kelamin, dan Password untuk mendaftar!"); return; }
 
         $("#main-loader").css("display", "flex");
-        $("#loader-text").text("Memeriksa keunikan nama...");
+        $("#loader-text").text("Memeriksa sistem nama unik...");
 
-        // LANGKAH 1: Cek nama kembar
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
@@ -113,8 +162,7 @@
                     $("#main-loader").hide();
                     alert(res.message);
                 } else {
-                    // LANGKAH 2: Jika nama baru/unik, daftarkan akun baru
-                    $("#loader-text").text("Membuat akun jurnal baru...");
+                    $("#loader-text").text("Membuat kunci akun baru...");
                     let passOrtu = prompt("Buat 1 Password khusus untuk Orang Tua memantau nanti:", "123456");
                     if(!passOrtu) { $("#main-loader").hide(); return; }
 
@@ -126,15 +174,14 @@
                         success: function(saveRes) {
                             $("#main-loader").hide();
                             if(saveRes.status === "success") {
-                                let sesi = { role: "siswa", nama: nama, jk: jk, passAnak: pass };
-                                localStorage.setItem("user_sholat", JSON.stringify(sesi));
-                                window.location.href = "sholat.html";
+                                alert("Akun berhasil dibuat! Silakan langsung klik tombol LOGIN.");
+                                resetFormSiswa();
                             }
                         }
                     });
                 }
             },
-            error: function() { $("#main-loader").hide(); alert("Gagal terhubung ke database."); }
+            error: function() { $("#main-loader").hide(); alert("Koneksi internet bermasalah."); }
         });
     }
 
