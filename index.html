@@ -3,135 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantauan Jurnal Sholat - Orang Tua</title>
+    <title>Jurnal Sholat Digital - Gates</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #0a4227; --accent: #198754; --bg: #f4f6f9; }
+        :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: var(--bg); padding-bottom: 30px; }
-        .header-ortu { background: var(--primary); color: white; padding: 20px; border-radius: 0 0 20px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-keluar { background: #dc3545; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
-        .skor-box { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; text-align: center; margin-top: 10px; }
-        .container { max-width: 480px; margin: 20px auto; width: 92%; }
-        .filter-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.04); margin-bottom: 15px; }
-        .input-group { display: flex; gap: 10px; margin-top: 8px; }
-        .input-group input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .btn-cari { background: var(--accent); color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; }
-        .log-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
-        .sholat-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #eee; }
-        .sholat-row:last-child { border-bottom: none; }
-        .sholat-name { font-weight: 600; color: #333; }
-        .sholat-badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .status-kosong { background: #f8d7da; color: #842029; }
-        .status-berjamaah { background: #d1e7dd; color: #0f5132; }
-        .status-awal { background: #cff4fc; color: #055160; }
-        .status-pertengahan { background: #fff3cd; color: #664d03; }
-        .status-akhir { background: #f8d7da; color: #842029; }
-        .loader { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:100; justify-content:center; align-items:center; flex-direction:column; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .login-box { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-top: 5px solid var(--primary); }
+        .logo-area { text-align: center; margin-bottom: 25px; }
+        .logo-area i { font-size: 45px; color: var(--primary); }
+        .logo-area h3 { margin-top: 10px; color: #333; font-size: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #eee; padding: 5px; border-radius: 8px; }
+        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; color: #666; transition: 0.2s; }
+        .tab.active { background: var(--primary); color: white; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #444; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
+        .form-group input:focus { border-color: var(--primary); }
+        .gender-box { display: flex; gap: 15px; margin-top: 5px; }
+        .gender-opt { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-submit:hover { background: #0b3d26; }
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; flex-direction: column; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="header-ortu">
-    <div class="top-bar">
-        <div>
-            <p style="font-size: 12px; opacity: 0.8;">Selamat Datang Wali Murid</p>
-            <h3 id="lbl-anak" style="font-size: 18px; margin-top: 2px;">Nama Anak</h3>
-        </div>
-        <button class="btn-keluar" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+<div class="login-box">
+    <div class="logo-area">
+        <i class="fas fa-mosque"></i>
+        <h3>Jurnal Sholat Digital</h3>
     </div>
-    <div class="skor-box">
-        <p style="font-size: 11px; opacity: 0.9;">Total Akumulasi Skor Keseluruhan Waktu</p>
-        <h2 style="font-size: 28px; margin-top: 2px;"><span id="total-skor">0</span> <span style="font-size: 14px;">Poin</span></h2>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('siswa')">Menu Santri</div>
+        <div class="tab" onclick="switchTab('ortu')">Orang Tua</div>
+    </div>
+
+    <div id="panel-siswa">
+        <div class="form-group">
+            <label>Nama Lengkap Ananda (Harus Unik)</label>
+            <input type="text" id="siswa-nama" placeholder="Contoh: Syafia Ahmad">
+        </div>
+        <div class="form-group">
+            <label>Jenis Kelamin</label>
+            <div class="gender-box">
+                <label class="gender-opt"><input type="radio" name="siswa-jk" value="L"> Laki-laki</label>
+                <label class="gender-opt"><input type="radio" name="siswa-jk" value="P"> Perempuan</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Password Akun Anak</label>
+            <input type="password" id="siswa-pass" placeholder="Buat password bebas">
+        </div>
+        <button class="btn-submit" onclick="prosesMasukSiswa()">Masuk / Daftar Jurnal</button>
+    </div>
+
+    <div id="panel-ortu" style="display: none;">
+        <div class="form-group">
+            <label>Nama Lengkap Santri</label>
+            <input type="text" id="ortu-anak" placeholder="Tulis nama anak Anda">
+        </div>
+        <div class="form-group">
+            <label>Password Khusus Orang Tua</label>
+            <input type="password" id="ortu-pass" placeholder="Masukkan password wali murid">
+        </div>
+        <button class="btn-submit" onclick="prosesLoginOrtu()">Masuk Pantauan</button>
     </div>
 </div>
 
-<div class="container">
-    <div class="filter-card">
-        <label style="font-size: 13px; font-weight: bold; color: #555;">Pilih Tanggal Riwayat Laporan</label>
-        <div class="input-group">
-            <input type="date" id="cari-tanggal">
-            <button class="btn-cari" onclick="loadRiwayatTanggal()"><i class="fas fa-search"></i> Cari</button>
-        </div>
-    </div>
-
-    <div class="log-container">
-        <h4 id="judul-log" style="font-size: 14px; margin-bottom: 10px; color:#444;">Laporan Hari Ini:</h4>
-        <div id="wrapper-sholat"></div>
-    </div>
-</div>
-
-<div class="loader" id="dashboard-loader">
-    <i class="fas fa-spinner fa-spin fa-2x" style="color:var(--primary); margin-bottom:10px;"></i>
-    <p style="font-size: 13px; color:#555;">Menarik data amalan dari server...</p>
+<div class="loader-overlay" id="main-loader">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom:10px;"></i>
+    <span id="loader-text">Memproses data...</span>
 </div>
 
 <script>
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbzE-c7kUbnECWa4daQ4vrJfSQhzpU3awqjb8BRXt5szPmNV842nQTmcuYri0cwHnUUU/exec"; 
-    let sesiOrtu = JSON.parse(localStorage.getItem("user_ortu"));
+    const URL_DATABASE = "PASTE_LINK_WEB_APP_GOOGLE_SCRIPT_BAPAK_DISINI";
 
-    if (!sesiOrtu) { window.location.href = "index.html"; }
+    function switchTab(role) {
+        $(".tab").removeClass("active");
+        if(role === 'siswa') {
+            $("[onclick*='siswa']").addClass("active");
+            $("#panel-siswa").show(); $("#panel-ortu").hide();
+        } else {
+            $("[onclick*='ortu']").addClass("active");
+            $("#panel-siswa").hide(); $("#panel-ortu").show();
+        }
+    }
 
-    $(document).ready(function() {
-        $("#lbl-anak").text(sesiOrtu.namaAnak);
-        let hariIni = new Date().toISOString().split('T')[0];
-        $("#cari-tanggal").val(hariIni);
-        ambilDataServer(hariIni);
-    });
+    function prosesMasukSiswa() {
+        let nama = $("#siswa-nama").val().trim();
+        let jk = $("input[name='siswa-jk']:checked").val();
+        let pass = $("#siswa-pass").val().trim();
 
-    function ambilDataServer(tanggalTarget) {
-        $("#dashboard-loader").css("display", "flex");
+        if(!nama || !jk || !pass) { alert("Harap lengkapi semua bidang isian anak!"); return; }
+
+        $("#main-loader").css("display", "flex");
+        $("#loader-text").text("Memeriksa keunikan nama...");
+
+        // LANGKAH 1: Cek nama kembar
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
-            data: { action: "ambilLaporanOrtu", namaAnak: sesiOrtu.namaAnak, tanggal: tanggalTarget },
+            data: { action: "cekNamaUnik", nama: nama },
             dataType: "json",
             success: function(res) {
-                $("#dashboard-loader").hide();
-                if (res && res.status === "success") {
-                    $("#total-skor").text(res.akumulasiSkor);
-                    renderDaftarSholat(res.dataSholat);
+                if (res.status === "exists") {
+                    $("#main-loader").hide();
+                    alert(res.message);
+                } else {
+                    // LANGKAH 2: Jika nama baru/unik, daftarkan akun baru
+                    $("#loader-text").text("Membuat akun jurnal baru...");
+                    let passOrtu = prompt("Buat 1 Password khusus untuk Orang Tua memantau nanti:", "123456");
+                    if(!passOrtu) { $("#main-loader").hide(); return; }
+
+                    $.ajax({
+                        url: URL_DATABASE,
+                        type: "GET",
+                        data: { action: "simpanDataSiswaBaru", nama: nama, jk: jk, passAnak: pass, passOrtu: passOrtu },
+                        dataType: "json",
+                        success: function(saveRes) {
+                            $("#main-loader").hide();
+                            if(saveRes.status === "success") {
+                                let sesi = { role: "siswa", nama: nama, jk: jk, passAnak: pass };
+                                localStorage.setItem("user_sholat", JSON.stringify(sesi));
+                                window.location.href = "sholat.html";
+                            }
+                        }
+                    });
                 }
             },
-            error: function() { $("#dashboard-loader").hide(); alert("Gagal mengambil data riwayat."); }
+            error: function() { $("#main-loader").hide(); alert("Gagal terhubung ke database."); }
         });
     }
 
-    function renderDaftarSholat(dataSholat) {
-        let htmlContent = "";
-        const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
-        listWaktu.forEach(waktu => {
-            let poinStr = dataSholat && dataSholat[waktu] ? String(dataSholat[waktu]).trim() : "0";
-            let teksStatus = "Belum Diisi / Lewat Waktu";
-            let classBadge = "status-kosong";
+    function prosesLoginOrtu() {
+        let namaAnak = $("#ortu-anak").val().trim();
+        let passOrtu = $("#ortu-pass").val().trim();
 
-            if (poinStr === "20") { teksStatus = "Berjamaah / Uzur (20 Poin)"; classBadge = "status-berjamaah"; }
-            else if (poinStr === "15") { teksStatus = "Awal Waktu (15 Poin)"; classBadge = "status-awal"; }
-            else if (poinStr === "10") { teksStatus = "Tengah Waktu (10 Poin)"; classBadge = "status-pertengahan"; }
-            else if (poinStr === "5") { teksStatus = "Akhir Waktu (5 Poin)"; classBadge = "status-akhir"; }
+        if(!namaAnak || !passOrtu) { alert("Harap isi nama anak dan password!"); return; }
 
-            htmlContent += `
-                <div class="sholat-row">
-                    <span class="sholat-name">${waktu}</span>
-                    <span class="sholat-badge ${classBadge}">${teksStatus}</span>
-                </div>`;
+        $("#main-loader").css("display", "flex");
+        $("#loader-text").text("Memverifikasi password wali...");
+
+        $.ajax({
+            url: URL_DATABASE,
+            type: "GET",
+            data: { action: "loginOrtuNew", namaAnak: namaAnak, passOrtu: passOrtu },
+            dataType: "json",
+            success: function(res) {
+                $("#main-loader").hide();
+                if(res.status === "success") {
+                    let sesiOrtu = { role: "ortu", namaAnak: res.namaAnak };
+                    localStorage.setItem("user_ortu", JSON.stringify(sesiOrtu));
+                    window.location.href = "dashboard_ortu.html";
+                } else {
+                    alert(res.message);
+                }
+            },
+            error: function() { $("#main-loader").hide(); alert("Koneksi gagal."); }
         });
-        $("#wrapper-sholat").html(htmlContent);
-    }
-
-    function loadRiwayatTanggal() {
-        let tglDipilih = $("#cari-tanggal").val();
-        if (!tglDipilih) return;
-        let opsi = { day: 'numeric', month: 'long', year: 'numeric' };
-        $("#judul-log").text("Laporan Tanggal: " + new Date(tglDipilih).toLocaleDateString('id-ID', opsi));
-        ambilDataServer(tglDipilih);
-    }
-
-    function logout() {
-        localStorage.removeItem("user_ortu");
-        window.location.href = "index.html";
     }
 </script>
 </body>
