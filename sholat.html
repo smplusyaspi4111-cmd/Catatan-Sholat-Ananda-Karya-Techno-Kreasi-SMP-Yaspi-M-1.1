@@ -105,11 +105,19 @@
     }
 
     function kirimSemuaJurnal() {
-        let hariIni = new Date().toISOString().split('T')[0];
+        // 1. Membuat format Tanggal + Nama Hari (Contoh: Sabtu, 27-06-2026)
+        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+        let tanggalDanHari = new Date().toLocaleDateString('id-ID', opsiHari); 
+        // Mengubah tanda koma/spasi bawaan browser agar seragam rapi
+        tanggalDanHari = tanggalDanHari.replace(/,/g, '').replace(/\//g, '-'); 
+
         $("#sholat-loader").css("display", "flex");
 
-        // Merakit format teks ringkas untuk disimpan di Google Sheet (S:15 | Z:20 dll)
-        let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"];
+        // 2. Menghitung Total Nilai secara Mandiri di Web
+        let totalSkorSiswa = rincianPilihan["Subuh"] + rincianPilihan["Zuhur"] + rincianPilihan["Asar"] + rincianPilihan["Magrib"] + rincianPilihan["Isya"];
+
+        // 3. Merakit format teks baru dengan total nilai di ujungnya
+        let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"] + " [Total: " + totalSkorSiswa + " Poin]";
 
         $.ajax({
             url: URL_DATABASE,
@@ -117,15 +125,20 @@
             data: {
                 action: "simpanPoinSholat",
                 nama: sesiSiswa.nama,
-                tanggal: hariIni,
-                rincianPoin: teksFormatSheet
+                tanggal: tanggalDanHari, // Mengirim format tanggal + hari baru ke kolom header G1
+                rincianPoin: teksFormatSheet // Mengirim format teks + total skor ke sel G2
             },
             dataType: "json",
             success: function(res) {
                 $("#sholat-loader").hide();
-                if(res.status === "success") { alert("Alhamdulillah, jurnal sholat sukses tersimpan!"); }
+                if(res.status === "success") { 
+                    alert("Alhamdulillah, jurnal sholat sukses tersimpan!"); 
+                }
             },
-            error: function() { $("#sholat-loader").hide(); alert("Koneksi gagal."); }
+            error: function() { 
+                $("#sholat-loader").hide(); 
+                alert("Koneksi gagal."); 
+            }
         });
     }
 
