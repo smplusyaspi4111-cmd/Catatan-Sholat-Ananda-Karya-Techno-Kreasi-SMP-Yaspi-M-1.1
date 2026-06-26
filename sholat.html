@@ -19,11 +19,14 @@
         .sholat-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .opsi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-opsi { padding: 12px 8px; border: 2px solid #e9ecef; background: #f8f9fa; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        
+        /* WARNA BARU TOMBOL OPSI */
         .btn-opsi.active-berjamaah { background: #d1e7dd; border-color: #0f5132; color: #0f5132; }
         .btn-opsi.active-awal { background: #cff4fc; border-color: #055160; color: #055160; }
         .btn-opsi.active-tengah { background: #fff3cd; border-color: #664d03; color: #664d03; }
         .btn-opsi.active-akhir { background: #f8d7da; border-color: #842029; color: #842029; }
-        .btn-opsi.active-uzur { background: #f3e5f5; border-color: #6a1b9a; color: #6a1b9a; }
+        .btn-opsi.active-uzur { background: #e2e3e5; border-color: #6c757d; color: #383d41; } /* ABU ABU UZUR */
+        
         .btn-simpan-all { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; color: white; flex-direction: column; }
     </style>
@@ -54,13 +57,12 @@
 </div>
 
 <script>
-    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbzE-c7kUbnECWa4daQ4vrJfSQhzpU3awqjb8BRXt5szPmNV842nQTmcuYri0cwHnUUU/exec";
-    // Cek baris ini di sholat.html Bapak
+    // MASUKKAN URL WEB APP GOOGLE SCRIPT BARU BAPAK DI SINI
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbz1gT-x00RPlL8P5qUvC4gE-P70Yy_vI42kE_BAPAK/exec"; 
     let sesiSiswa = JSON.parse(localStorage.getItem("user_sholat"));
 
-    if (!sesiSiswa || sesiSiswa.role !== "siswa") { 
-        window.location.href = "index.html"; 
-    }
+    if (!sesiSiswa) { window.location.href = "index.html"; }
+
     var rincianPilihan = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
 
     $(document).ready(function() {
@@ -82,7 +84,7 @@
                     <div class="opsi-grid">
                         ${sesiSiswa.jk === 'L' ? 
                         `<button class="btn-opsi" id="btn-${w}-20" onclick="pilihOpsi('${w}', 20, 'berjamaah')"><i class="fas fa-users"></i> Berjamaah (20)</button>` : 
-                        `<button class="btn-opsi" id="btn-${w}-20" onclick="pilihOpsi('${w}', 20, 'uzur')"><i class="fas fa-venus-mars"></i> Uzur/Haid (20)</button>`}
+                        `<button class="btn-opsi" id="btn-${w}-20" onclick="pilihOpsi('${w}', 20, 'uzur')"><i class="fas fa-calendar-times"></i> Uzur/Haid (20)</button>`}
                         <button class="btn-opsi" id="btn-${w}-15" onclick="pilihOpsi('${w}', 15, 'awal')"><i class="fas fa-stopwatch"></i> Awal Waktu (15)</button>
                         <button class="btn-opsi" id="btn-${w}-10" onclick="pilihOpsi('${w}', 10, 'tengah')"><i class="fas fa-hourglass-half"></i> Tengah Waktu (10)</button>
                         <button class="btn-opsi" id="btn-${w}-5" onclick="pilihOpsi('${w}', 5, 'akhir')"><i class="fas fa-history"></i> Akhir Waktu (5)</button>
@@ -106,14 +108,17 @@
         let hariIni = new Date().toISOString().split('T')[0];
         $("#sholat-loader").css("display", "flex");
 
+        // Merakit format teks ringkas untuk disimpan di Google Sheet (S:15 | Z:20 dll)
+        let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"];
+
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
             data: {
-                action: "simpanPoinSholat", // Tepat menembak fungsi update data ke kanan
+                action: "simpanPoinSholat",
                 nama: sesiSiswa.nama,
                 tanggal: hariIni,
-                rincianPoin: JSON.stringify(rincianPilihan)
+                rincianPoin: teksFormatSheet
             },
             dataType: "json",
             success: function(res) {
