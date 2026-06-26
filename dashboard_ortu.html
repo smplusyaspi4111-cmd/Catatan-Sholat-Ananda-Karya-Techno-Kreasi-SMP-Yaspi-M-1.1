@@ -75,7 +75,180 @@
 
 <script>
     // MASUKKAN URL WEB APP GOOGLE SCRIPT BAPAK DI SINI
+    const URL_DATABASE = "<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantauan Jurnal Sholat Ananda</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: var(--bg); padding-bottom: 30px; }
+        .header-ortu { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 30px 20px; text-align: center; border-radius: 0 0 20px 20px; position: relative; }
+        .btn-logout { position: absolute; right: 15px; top: 20px; background: #dc3545; border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .container { max-width: 480px; margin: 0 auto; width: 92%; }
+        .skor-box { background: rgba(255,255,255,0.15); padding: 15px; border-radius: 12px; margin-top: 15px; display: inline-block; min-width: 200px; }
+        .skor-angka { font-size: 32px; font-weight: bold; display: block; }
+        .card-search { background: white; margin: 20px 0; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .search-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #555; }
+        .search-flex { display: flex; gap: 10px; }
+        .search-flex input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
+        .btn-cari { background: var(--secondary); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .card-laporan { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .laporan-title { font-size: 15px; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #f1f3f5; padding-bottom: 8px; color: #333; }
+        .sholat-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f1f3f5; }
+        .sholat-row:last-child { border-bottom: none; }
+        .waktu-nama { font-weight: 600; color: #444; font-size: 15px; }
+        
+        /* BADGE STATUS WARNA-WARNI */
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-align: center; }
+        .status-belum { background: #f8d7da; color: #842029; }
+        .status-berjamaah { background: #d1e7dd; color: #0f5132; }
+        .status-awal { background: #cff4fc; color: #055160; }
+        .status-tengah { background: #fff3cd; color: #664d03; }
+        .status-akhir { background: #ffe5e5; color: #b02a37; }
+        .status-uzur { background: #e2e3e5; color: #6c757d; }
+
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+<div class="header-ortu">
+    <button class="btn-logout" onclick="logoutOrtu()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+    <p style="font-size: 12px; opacity: 0.9;">Selamat Datang Wali Murid</p>
+    <h2 id="nama-anak-title">Nama Anak</h2>
+    
+    <div class="skor-box">
+        <span class="search-title" style="color: #eee; display:block; margin-bottom:5px;">Total Akumulasi Skor Hari Ini</span>
+        <span class="skor-angka" id="total-skor-display">0</span> <span style="font-size:12px;">Poin</span>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card-search">
+        <div class="search-title">Pilih Tanggal Riwayat Laporan</div>
+        <div class="search-flex">
+            <input type="date" id="input-tanggal-cari">
+            <button class="btn-cari" onclick="loadDataLaporanOrtu()"><i class="fas fa-search"></i> Cari</button>
+        </div>
+    </div>
+
+    <div class="card-laporan">
+        <div class="laporan-title" id="label-hari-ini">Laporan Hari Ini:</div>
+        <div id="box-daftar-laporan">
+            <!-- Data baris sholat di-render otomatis oleh JavaScript -->
+        </div>
+    </div>
+</div>
+
+<div class="loader-overlay" id="loader-ortu">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px;"></i>
+    <span>Menarik data amalan dari server...</span>
+</div>
+
+<script>
+    // MASUKKAN URL WEB APP GOOGLE SCRIPT BAPAK DI SINI
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycb0Go2RttBdI0rhYu8ncMtAWYiChAn4V8yaYICn_SBs5JdFGlc1y2H-dxOsYjVqLTEl/exec";
+    
+    let sesiOrtu = JSON.parse(localStorage.getItem("user_ortu"));
+    if (!sesiOrtu || sesiOrtu.role !== "ortu") { window.location.href = "index.html"; }
+
+    $(document).ready(function() {
+        $("#nama-anak-title").text(sesiOrtu.namaAnak);
+        
+        // Set default input tanggal ke hari ini sesuai zona waktu lokal
+        let hariIni = new Date();
+        let offset = hariIni.getTimezoneOffset();
+        hariIni = new Date(hariIni.getTime() - (offset * 60 * 1000));
+        $("#input-tanggal-cari").val(hariIni.toISOString().split('T')[0]);
+        
+        loadDataLaporanOrtu();
+    });
+
+    function loadDataLaporanOrtu() {
+        let tanggalMentah = $("#input-tanggal-cari").val();
+        if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
+
+        // Format ke string tanggal lokal untuk dicari di database
+        let d = new Date(tanggalMentah);
+        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+        let tanggalTargetFormat = d.toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-');
+
+        $("#loader-ortu").css("display", "flex");
+
+        $.ajax({
+            url: URL_DATABASE,
+            type: "GET",
+            data: {
+                action: "ambilLaporanOrtu",
+                namaAnak: sesiOrtu.namaAnak,
+                tanggal: tanggalTargetFormat
+            },
+            dataType: "json",
+            success: function(res) {
+                $("#loader-ortu").hide();
+                if (res.status === "success") {
+                    $("#total-skor-display").text(res.akumulasiSkor);
+                    renderTabelLaporan(res.dataSholat);
+                } else {
+                    alert(res.message);
+                }
+            },
+            error: function() {
+                $("#loader-ortu").hide();
+                alert("Gagal mengunduh laporan, periksa koneksi internet.");
+            }
+        });
+    }
+
+    function renderTabelLaporan(dataSholat) {
+        const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
+        let html = "";
+        
+        listWaktu.forEach(w => {
+            let poin = dataSholat[w] || 0;
+            let badgeKelas = "status-belum";
+            let teksStatus = "Belum Diisi / Lewat Waktu";
+
+            // Terjemahkan skor angka kembali menjadi nama status indah
+            if (poin === 20) {
+                // Bisa Berjamaah (Laki-laki) atau Uzur (Perempuan)
+                teksStatus = "Terisi (+20 Poin)";
+                badgeKelas = "status-berjamaah"; 
+            } else if (poin === 15) {
+                teksStatus = "Awal Waktu (+15 Poin)";
+                badgeKelas = "status-awal";
+            } else if (poin === 10) {
+                teksStatus = "Tengah Waktu (+10 Poin)";
+                badgeKelas = "status-tengah";
+            } else if (poin === 5) {
+                teksStatus = "Akhir Waktu (+5 Poin)";
+                badgeKelas = "status-akhir";
+            }
+
+            html += `
+                <div class="sholat-row">
+                    <span class="waktu-nama">${w}</span>
+                    <span class="status-badge ${badgeKelas}">${teksStatus}</span>
+                </div>`;
+        });
+        
+        $("#box-daftar-laporan").html(html);
+    }
+
+    function logoutOrtu() {
+        if (confirm("Keluar dari sistem pantauan?")) {
+            localStorage.removeItem("user_ortu");
+            window.location.href = "index.html";
+        }
+    }
+</script>
+</body>
+</html>";
     
     let sesiOrtu = JSON.parse(localStorage.getItem("user_ortu"));
     if (!sesiOrtu || sesiOrtu.role !== "ortu") { window.location.href = "index.html"; }
