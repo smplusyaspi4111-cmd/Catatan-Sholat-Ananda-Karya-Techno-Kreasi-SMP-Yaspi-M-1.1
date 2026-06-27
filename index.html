@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        * { box-shadow: none; box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         .login-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
         .logo-area { color: var(--primary); font-size: 45px; margin-bottom: 10px; }
@@ -20,7 +20,7 @@
         .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
         .btn-submit { width: 100%; padding: 12px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 99; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -60,12 +60,12 @@
 </div>
 
 <div class="loader-overlay" id="loading">
-    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px;"></i>
-    <span id="load-text">Memeriksa data...</span>
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px; color: #198754;"></i>
+    <span style="font-weight: 500;">Memeriksa data ke server...</span>
 </div>
 
 <script>
-    // Taruh URL Google Web App (/exec) Bapak di bawah ini
+    // URL Web App terbaru milik Bapak yang sudah diverifikasi aktif
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
 
     function gantiTab(tipe) {
@@ -85,19 +85,27 @@
         if(!nama || !pass) { alert("Nama dan password anak harus diisi!"); return; }
 
         $("#loading").css("display", "flex");
+        
+        // Menggunakan AJAX JSONP agar tidak diblokir browser
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
             data: { action: "loginSiswa", nama: nama, password: pass },
-            dataType: "json",
+            dataType: "jsonp",
+            jsonp: "callback",
             success: function(res) {
                 $("#loading").hide();
                 if(res.status === "success") {
                     localStorage.setItem("user_siswa", JSON.stringify({ role: "siswa", nama: res.nama }));
                     window.location.href = "sholat.html";
-                } else { alert(res.message); }
+                } else { 
+                    alert(res.message); 
+                }
             },
-            error: function() { $("#loading").hide(); alert("Koneksi gagal, periksa web app Anda."); }
+            error: function() { 
+                $("#loading").hide(); 
+                alert("Gagal menghubungkan ke web app. Pastikan setelan Web App adalah 'Anyone'."); 
+            }
         });
     }
 
@@ -107,19 +115,27 @@
         if(!namaAnak || !passOrtu) { alert("Nama anak dan password ortu wajib diisi!"); return; }
 
         $("#loading").css("display", "flex");
+        
+        // Menggunakan AJAX JSONP agar tidak diblokir browser
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
             data: { action: "loginOrtu", namaAnak: namaAnak, passwordOrtu: passOrtu },
-            dataType: "json",
+            dataType: "jsonp",
+            jsonp: "callback",
             success: function(res) {
                 $("#loading").hide();
                 if(res.status === "success") {
                     localStorage.setItem("user_ortu", JSON.stringify({ role: "ortu", namaAnak: res.namaAnak }));
                     window.location.href = "dashboard_ortu.html";
-                } else { alert(res.message); }
+                } else { 
+                    alert(res.message); 
+                }
             },
-            error: function() { $("#loading").hide(); alert("Gagal terhubung ke database server orang tua."); }
+            error: function() { 
+                $("#loading").hide(); 
+                alert("Gagal terhubung ke database server orang tua."); 
+            }
         });
     }
 </script>
