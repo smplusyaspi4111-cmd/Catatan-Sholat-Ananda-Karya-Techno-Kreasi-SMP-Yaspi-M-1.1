@@ -90,23 +90,31 @@
         let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"] + " [Total: " + totalSkorSiswa + " Poin]";
 
         $.ajax({
-            url: URL_DATABASE,
-            type: "GET",
-            data: { action: "simpanPoinSholat", nama: sesiSiswa.nama, tanggal: tanggalDanHari, rincianPoin: teksFormatSheet },
-            dataType: "json",
-            success: function(res) {
-                $("#sholat-loader").hide();
-                tombolSimpan.prop("disabled", false).css("opacity", "1").html('<i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server');
-                if(res.status === "success") { alert("Alhamdulillah, jurnal sholat sukses tersimpan!"); }
-            },
-            error: function() { 
-                $("#sholat-loader").hide(); 
-                tombolSimpan.prop("disabled", false).css("opacity", "1").html('<i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server');
-                alert("Koneksi bermasalah saat menyimpan."); 
-            }
-        });
+    url: URL_DATABASE,
+    type: "GET",
+    data: { 
+        action: "loginSiswa", 
+        nama: namaInput, 
+        password: passwordInput 
+    },
+    dataType: "jsonp",  // <--- WAJIB ADA
+    jsonp: "callback",  // <--- WAJIB ADA
+    success: function(res) {
+        $("#loader").hide();
+        if (res.status === "success") {
+            alert(res.message);
+            // Simpan sesi dan arahkan ke halaman jurnal
+            localStorage.setItem("user_siswa", JSON.stringify({ nama: res.nama, role: "siswa" }));
+            window.location.href = "sholat.html"; 
+        } else {
+            alert(res.message);
+        }
+    },
+    error: function() {
+        $("#loader").hide();
+        alert("Koneksi gagal, periksa web app Anda.");
     }
-
+});
     function logoutSiswa() { localStorage.removeItem("user_siswa"); window.location.href = "index.html"; }
 </script>
 </body>
