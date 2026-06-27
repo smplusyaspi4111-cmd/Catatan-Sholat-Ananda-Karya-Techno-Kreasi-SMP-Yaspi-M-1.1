@@ -80,60 +80,67 @@
         loadDataLaporanOrtu();
     });
 
-    function loadDataLaporanOrtu() {
+function loadDataLaporanOrtu() {
     let tanggalMentah = $("#input-tanggal-cari").val();
     if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
 
     let d = new Date(tanggalMentah);
     let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+    // Format agar menghasilkan format tanggal standar database Anda
     let tanggalTargetFormat = d.toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-');
 
     $("#loader-ortu").css("display", "flex");
 
-    // MENGGUNAKAN TEKNIK JSONP UNTUK MENEMBUS BLOKIRAN INTERNET BROWSER
     $.ajax({
         url: URL_DATABASE,
         type: "GET",
-        data: { action: "ambilLaporanOrtu", namaAnak: sesiOrtu.namaAnak, tanggal: tanggalTargetFormat },
-        dataType: "jsonp", // <--- KUNCI UTAMA: Wajib diubah menjadi jsonp
-        jsonp: "callback", // <--- Ditambahkan agar dibaca fungsi Apps Script baru
+        data: { 
+            action: "ambilLaporanOrtu", 
+            namaAnak: sesiOrtu.namaAnak, 
+            tanggal: tanggalTargetFormat 
+        },
+        dataType: "jsonp",  // <--- SUDAH DIUBAH DARI "json" MENJADI "jsonp"
+        jsonp: "callback",  // <--- WAJIB DITAMBAHKAN
         success: function(res) {
             $("#loader-ortu").hide();
             if (res.status === "success") {
                 $("#total-skor-display").text(res.akumulasiSkor);
                 renderTabelLaporan(res.dataSholat);
-            } else { alert(res.message); }
+            } else { 
+                alert(res.message); 
+            }
         },
         error: function() { 
             $("#loader-ortu").hide(); 
-            alert("Gagal mengunduh data dari server. Mohon pastikan deployment Web App Anda sudah diset ke 'Anyone'."); 
+            alert("Gagal memuat data. Mohon periksa kembali jaringan internet Anda."); 
         }
     });
 }
 
-    function renderTabelLaporan(dataSholat) {
-        const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
-        let html = "";
+function renderTabelLaporan(dataSholat) {
+    let listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
+    let html = "";
+    
+    listWaktu.forEach(w => {
+        let poin = dataSholat[w] || 0;
+        let teksStatus = "Belum Diisi / Lewat Waktu";
+        let badgeKelas = "status-belum";
         
-        listWaktu.forEach(w => {
-            let poin = dataSholat[w] || 0;
-            let badgeKelas = "status-belum";
-            let teksStatus = "Belum Diisi / Lewat";
-
-            if (poin === 20) { teksStatus = "Berjamaah (+20)"; badgeKelas = "status-berjamaah"; } 
-            else if (poin === 15) { teksStatus = "Awal Waktu (+15)"; badgeKelas = "status-awal"; } 
-            else if (poin === 10) { teksStatus = "Tengah Waktu (+10)"; badgeKelas = "status-tengah"; } 
-            else if (poin === 5) { teksStatus = "Akhir Waktu (+5)"; badgeKelas = "status-akhir"; }
-
-            html += `
-                <div class="sholat-row">
-                    <span class="waktu-nama">${w}</span>
-                    <span class="status-badge ${badgeKelas}">${teksStatus}</span>
-                </div>`;
-        });
-        $("#box-daftar-laporan").html(html);
-    }
-
+        if (poin === 20) { teksStatus = "Terisi (+20 Poin) Bisa Berjamaah / Uzur"; badgeKelas = "status-berjamaah"; }
+        else if (poin === 15) { teksStatus = "Awal Waktu (+15 Poin)"; badgeKelas = "status-awal"; }
+        else if (poin === 10) { teksStatus = "Tengah Waktu (+10 Poin)"; badgeKelas = "status-tengah"; }
+        else if (poin === 5) { teksStatus = "Akhir Waktu (+5 Poin)"; badgeKelas = "status-akhir"; }
+        
+        html += `
+            <div class="item-laporan">
+                <span><b>${w}</b></span>
+                <span class="badge ${badgeKelas}">${teksStatus}</span>
+            </div>
+        `;
+    });
+    
+    $("#box-daftar-laporan").html(html);
+}
     function logoutOrtu() { localStorage.removeItem("user_ortu"); window.location.href = "index.html"; }
 </script>
 </body>
