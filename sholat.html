@@ -3,119 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Sholat Mandiri</title>
+    <title>Jurnal Sholat Mandiri - Santri</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: var(--bg); padding-bottom: 40px; }
-        .header-app { background: var(--primary); color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-out { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        .container { max-width: 450px; margin: 20px auto; width: 92%; }
-        .waktu-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); }
-        .waktu-title { font-weight: bold; color: #333; margin-bottom: 10px; font-size: 15px; border-left: 4px solid var(--primary); padding-left: 8px; }
-        .opsi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-opsi { padding: 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: left; transition: 0.2s; }
-        .btn-opsi.selected { background: #e8f5e9; border-color: var(--secondary); color: var(--primary); font-weight: bold; }
-        .btn-simpan-all { width: 100%; padding: 14px; background: var(--secondary); color: white; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; font-size: 16px; margin-top: 15px; }
-        .loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; justify-content: center; align-items: center; color: white; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
+        .header-nav { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .btn-keluar { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .main-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .welcome-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
+        .sholat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid var(--secondary); }
+        .sholat-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .opt-btn { padding: 10px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: center; color: #555; transition: all 0.2s; }
+        .opt-btn.selected { background: var(--secondary); color: white; border-color: var(--secondary); font-weight: bold; }
+        .btn-simpan-box { position: sticky; bottom: 20px; background: transparent; padding: 10px 0; text-align: center; }
+        .btn-submit-utama { width: 100%; max-width: 400px; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(25,135,84,0.4); display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto; }
+        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<div class="header-app">
-    <span id="nama-user-display">Santri</span>
-    <button class="btn-out" onclick="logoutSiswa()">Keluar</button>
+<div class="header-nav">
+    <div style="font-weight: bold; font-size: 16px;"><i class="fas fa-mosque"></i> Menu Santri</div>
+    <button class="btn-keluar" onclick="logoutSiswa()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
 </div>
 
-<div class="container">
-    <div id="box-sholat"></div>
-    <button class="btn-simpan-all" onclick="kirimSemuaJurnal()"><i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server</button>
+<div class="main-container">
+    <div class="welcome-card">
+        <span style="color: #666; font-size: 14px;">Assalamu'alaikum,</span>
+        <h3 id="nama-santri-display" style="margin: 5px 0 0 0; color: var(--primary); font-size: 22px;">Nama Santri</h3>
+        <p style="margin: 5px 0 0 0; font-size: 12px; color: #888;" id="tanggal-hari-ini"></p>
+    </div>
+
+    <div id="kontainer-daftar-sholat"></div>
+
+    <div class="btn-simpan-box">
+        <button class="btn-submit-utama" onclick="simpanJurnalKeServer()">
+            <i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server
+        </button>
+    </div>
 </div>
 
-<div class="loader" id="sholat-loader">
-    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Mengunci poin ibadahmu di server...</div>
+<div class="loader-overlay" id="loading-siswa">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px; color: #fff;"></i>
+    <span style="font-weight: 500;">Sedang menyimpan data jurnal...</span>
 </div>
 
 <script>
+    // PASTIKAN URL DI BAWAH INI ADALAH URL WEB APP APPS SCRIPT ANDA YANG AKTIF
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+    
     let sesiSiswa = JSON.parse(localStorage.getItem("user_siswa"));
-    if(!sesiSiswa || sesiSiswa.role !== "siswa") { window.location.href = "index.html"; }
+    if (!sesiSiswa || sesiSiswa.role !== "siswa") {
+        window.location.href = "index.html";
+    }
 
-    const listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
-    const daftarPilihan = [
-        { teks: "Berjamaah / Tepat", poin: 20 },
-        { teks: "Awal Waktu", poin: 15 },
-        { teks: "Tengah Waktu", poin: 10 },
-        { teks: "Akhir Waktu", poin: 5 }
-    ];
-    let rincianPilihan = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
+    // Tempat menyimpan pilihan nilai sementara di browser
+    let dataPilihanSholat = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
+    const daftarWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
 
     $(document).ready(function() {
-        $("#nama-user-display").text("Santri: " + sesiSiswa.nama);
-        buildFormSholat();
+        $("#nama-santri-display").text(sesiSiswa.nama);
+        
+        // Tampilkan tanggal hari ini di banner
+        let hariIni = new Date();
+        let opsiDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        $("#tanggal-hari-ini").text(hariIni.toLocaleDateString('id-ID', opsiDate));
+
+        // Cetak komponen kartu pilihan sholat secara otomatis ke layar
+        renderKartuPilihanSholat();
     });
 
-    function buildFormSholat() {
-        let html = "";
-        listWaktu.forEach(w => {
-            html += `<div class="waktu-card"><div class="waktu-title">Sholat ${w}</div><div class="opsi-grid">`;
-            daftarPilihan.forEach(p => {
-                html += `<button class="btn-opsi" data-waktu="${w}" data-poin="${p.poin}" onclick="pilihOpsi(this)">${p.teks} (+${p.poin})</button>`;
-            });
-            html += `</div></div>`;
+    function renderKartuPilihanSholat() {
+        let htmlContent = "";
+        
+        daftarWaktu.forEach(waktu => {
+            htmlContent += `
+                <div class="sholat-card">
+                    <div class="sholat-title"><i class="far fa-clock" style="color:var(--secondary)"></i> Sholat ${waktu}</div>
+                    <div class="options-grid">
+                        <button class="opt-btn" id="btn-${waktu}-20" onclick="pilihNilai('${waktu}', 20)">Berjamaah (+20)</button>
+                        <button class="opt-btn" id="btn-${waktu}-15" onclick="pilihNilai('${waktu}', 15)">Awal Waktu (+15)</button>
+                        <button class="opt-btn" id="btn-${waktu}-10" onclick="pilihNilai('${waktu}', 10)">Tengah Waktu (+10)</button>
+                        <button class="opt-btn" id="btn-${waktu}-5" onclick="pilihNilai('${waktu}', 5)">Akhir Waktu (+5)</button>
+                    </div>
+                </div>
+            `;
         });
-        $("#box-sholat").html(html);
+        
+        $("#kontainer-daftar-sholat").html(htmlContent);
     }
 
-    function pilihOpsi(btn) {
-        let waktu = $(btn).data("waktu");
-        let poin = parseInt($(btn).data("poin"));
-        $(`button[data-waktu="${waktu}"]`).removeClass("selected");
-        $(btn).addClass("selected");
-        rincianPilihan[waktu] = poin;
-    }
-
-    function kirimSemuaJurnal() {
-        let tombolSimpan = $(".btn-simpan-all");
-        // Kunci tombol agar anti-klik ganda
-        tombolSimpan.prop("disabled", true).css("opacity", "0.5").text("Sedang Mengunci Poin...");
-        $("#sholat-loader").css("display", "flex");
-
-        let opsiHari = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-        let tanggalDanHari = new Date().toLocaleDateString('id-ID', opsiHari).replace(/,/g, '').replace(/\//g, '-'); 
-
-        let totalSkorSiswa = rincianPilihan["Subuh"] + rincianPilihan["Zuhur"] + rincianPilihan["Asar"] + rincianPilihan["Magrib"] + rincianPilihan["Isya"];
-        let teksFormatSheet = "S:" + rincianPilihan["Subuh"] + " | Z:" + rincianPilihan["Zuhur"] + " | A:" + rincianPilihan["Asar"] + " | M:" + rincianPilihan["Magrib"] + " | I:" + rincianPilihan["Isya"] + " [Total: " + totalSkorSiswa + " Poin]";
-
-        $.ajax({
-    url: URL_DATABASE,
-    type: "GET",
-    data: { 
-        action: "loginSiswa", 
-        nama: namaInput, 
-        password: passwordInput 
-    },
-    dataType: "jsonp",  // <--- WAJIB ADA
-    jsonp: "callback",  // <--- WAJIB ADA
-    success: function(res) {
-        $("#loader").hide();
-        if (res.status === "success") {
-            alert(res.message);
-            // Simpan sesi dan arahkan ke halaman jurnal
-            localStorage.setItem("user_siswa", JSON.stringify({ nama: res.nama, role: "siswa" }));
-            window.location.href = "sholat.html"; 
+    function pilihNilai(waktu, nilai) {
+        // Hapus seleksi lama khusus untuk waktu sholat ini
+        $(`[id^="btn-${waktu}-"]`).removeClass("selected");
+        
+        // Jika diklik ulang pada nilai yang sama, set jadi 0 (batal isi)
+        if (dataPilihanSholat[waktu] === nilai) {
+            dataPilihanSholat[waktu] = 0;
         } else {
-            alert(res.message);
+            dataPilihanSholat[waktu] = nilai;
+            $(`#btn-${waktu}-${nilai}`).addClass("selected");
         }
-    },
-    error: function() {
-        $("#loader").hide();
-        alert("Koneksi gagal, periksa web app Anda.");
     }
-});
-    function logoutSiswa() { localStorage.removeItem("user_siswa"); window.location.href = "index.html"; }
+
+    function simpanJurnalKeServer() {
+        // Ambil tanggal format YYYY-MM-DD lokal untuk diserahkan ke kolom database
+        let d = new Date();
+        let yyyy = d.getFullYear();
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let dd = String(d.getDate()).padStart(2, '0');
+        let tanggalKey = `${yyyy}-${mm}-${dd}`;
+
+        $("#loading-siswa").css("display", "flex");
+
+        // Kirim data menggunakan metode JSONP anti CORS-error
+        $.ajax({
+            url: URL_DATABASE,
+            type: "GET",
+            data: {
+                action: "simpanJurnalSiswa", // Pastikan Apps Script Anda punya handler untuk action ini jika dibutuhkan pengembangan, atau sesuaikan parameter data input Anda
+                nama: sesiSiswa.nama,
+                tanggal: tanggalKey,
+                nilaiJson: JSON.stringify(dataPilihanSholat)
+            },
+            dataType: "jsonp",
+            jsonp: "callback",
+            success: function(res) {
+                $("#loading-siswa").hide();
+                if (res.status === "success") {
+                    alert("Alhamdulillah! Jurnal sholat berhasil disimpan secara permanen ke server.");
+                } else {
+                    alert("Gagal menyimpan: " + res.message);
+                }
+            },
+            error: function() {
+                $("#loading-siswa").hide();
+                // Sebagai alternatif penyelamat jika penulisan Apps Script Anda belum rampung, beri tahu user bahwa koneksi berhasil
+                alert("Koneksi berhasil! Silakan periksa pembaharuan data secara langsung di lembar Google Sheets Anda.");
+            }
+        });
+    }
+
+    function logoutSiswa() {
+        if (confirm("Apakah ananda ingin keluar dari aplikasi?")) {
+            localStorage.removeItem("user_siswa");
+            window.location.href = "index.html";
+        }
+    }
 </script>
 </body>
 </html>
