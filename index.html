@@ -194,12 +194,66 @@
       }
     }
 
-    function prosesMasuk() {
-      $('#statusServer').fadeIn();
-      // Integrasikan fungsi AJAX pengiriman spreadsheet Bapak di bawah ini...
-      setTimeout(function(){ $('#statusServer').fadeOut(); }, 2000);
-    }
-  </script>
+    // GANTI URL DI BAWAH INI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT BAPAK!
+    var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
 
-</body>
-</html>
+    function prosesMasuk() {
+      var nama, password, action;
+      
+      if (currentTab === 'santri') {
+        nama = $('#namaSiswa').val().trim();
+        password = $('#pwSiswa').val().trim();
+        action = "loginSiswa";
+      } else {
+        nama = $('#namaAnakOrtu').val().trim();
+        password = $('#pwOrtu').val().trim();
+        action = "loginOrtu";
+      }
+
+      if (nama === "" || password === "") {
+        alert("Waduh! Nama dan Password/Voucher tidak boleh kosong, Pak!");
+        return;
+      }
+
+      // Memunculkan efek loading teks ala game
+      $('#statusServer').text("Menghubungkan ke server Minecraft...").fadeIn();
+      $('.minecraft-btn').prop('disabled', true).css('opacity', '0.6');
+
+      // Mengirim data menggunakan JSONP (agar tidak terkena CORS Error)
+      $.ajax({
+        url: WEB_APP_URL,
+        type: "GET",
+        dataType: "jsonp",
+        data: {
+          action: action,
+          nama: nama,         // untuk action loginSiswa
+          namaAnak: nama,     // untuk action loginOrtu
+          password: password, // untuk password anak / voucher
+          passwordOrtu: password, // untuk password ortu
+          isBaru: "true"      // otomatis mengizinkan daftar pakai voucher jika akun belum ada
+        },
+        success: function(response) {
+          $('#statusServer').fadeOut();
+          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
+
+          if (response.status === "success") {
+            if (currentTab === 'santri') {
+              alert("Selamat! Login/Pendaftaran Berhasil! Membuka Jurnal...");
+              // Mengalihkan santri ke halaman pengisian jurnal sholat
+              window.location.href = "sholat.html?nama=" + encodeURIComponent(response.nama);
+            } else {
+              alert("Login Orang Tua Berhasil! Membuka Dashboard Pantauan...");
+              // Mengalihkan orang tua ke halaman dashboard pemantauan
+              window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
+            }
+          } else {
+            alert("Gagal: " + response.message);
+          }
+        },
+        error: function() {
+          $('#statusServer').fadeOut();
+          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
+          alert("Gagal menghubungi server Google! Periksa koneksi internet atau URL Deployment Anda.");
+        }
+      });
+    }
