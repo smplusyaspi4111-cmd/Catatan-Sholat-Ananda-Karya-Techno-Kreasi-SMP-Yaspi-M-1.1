@@ -235,26 +235,34 @@
           $('#statusServer').fadeOut();
           $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
 
-          if (response.status === "success") {
-            if (currentTab === 'santri') {
-              alert("Selamat! Masuk Jurnal Berhasil!");
-              window.location.href = "sholat.html?nama=" + encodeURIComponent(response.nama);
-            } else {
-              alert("Login Orang Tua Berhasil!");
-              window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
-            }
-          } else {
-            alert("Gagal: " + response.message);
-          }
-        },
-        error: function() {
-          $('#statusServer').fadeOut();
-          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
-          alert("Gagal terhubung! Periksa koneksi atau URL Apps Script Anda.");
+         if (response.status === "success") {
+        if (currentTab === 'santri') {
+          alert("Selamat! Masuk Jurnal Berhasil!");
+          
+          // 1. Simpan sesi Santri agar tidak ditolak oleh sholat.html
+          localStorage.setItem("user_siswa", JSON.stringify({ nama: response.nama }));
+          
+          window.location.href = "sholat.html?nama=" + encodeURIComponent(response.nama);
+        } else {
+          alert("Login Orang Tua Berhasil!");
+          
+          // 2. Simpan sesi Orang Tua (jika nanti di dashboard_ortu.html menggunakan proteksi serupa)
+          localStorage.setItem("user_ortu", JSON.stringify({ namaAnak: response.namaAnak }));
+          
+          window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
         }
-      });
+      } else {
+        alert("Gagal: " + response.message);
+      }
+    },
+    error: function() {
+      $('#statusServer').fadeOut();
+      $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
+      alert("Gagal terhubung! Periksa koneksi atau URL Apps Script Anda.");
     }
-  </script>
+  });
+}
+</script>
 
 </body>
 </html>
