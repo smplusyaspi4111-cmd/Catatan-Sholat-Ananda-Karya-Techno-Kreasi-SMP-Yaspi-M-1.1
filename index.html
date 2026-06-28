@@ -3,47 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal Sholat Digital - SMP Yaspi</title>
+    <title>Gerbang Jurnal Sholat Digital</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
-        * { box-shadow: none; box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .login-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
-        .logo-area { color: var(--primary); font-size: 45px; margin-bottom: 10px; }
-        .app-title { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 25px; }
-        .tabs { display: flex; background: #e9ecef; padding: 4px; border-radius: 8px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; color: #6c757d; cursor: pointer; border-radius: 6px; }
-        .tab-btn.active { background: var(--primary); color: white; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef2f3; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .login-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; }
+        .tabs { display: flex; margin-bottom: 20px; background: #f1f3f5; border-radius: 8px; padding: 5px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-weight: bold; cursor: pointer; border-radius: 6px; color: #666; }
+        .tab-btn.active { background: #0f5132; color: white; }
         .form-group { text-align: left; margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
-        .btn-submit { width: 100%; padding: 12px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        .loader-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 99; justify-content: center; align-items: center; color: white; font-size: 14px; flex-direction: column; }
+        label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .btn-submit { width: 100%; padding: 12px; background: #0f5132; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .loader { display: none; margin: 15px 0; font-size: 14px; color: #0f5132; font-weight: 500; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div class="logo-area"><i class="fas fa-mosque"></i></div>
-    <div class="app-title">Jurnal Sholat Digital</div>
+    <i class="fas fa-mosque fa-3x" style="color: #0f5132; margin-bottom: 10px;"></i>
+    <h2 style="margin: 0 0 20px 0; color: #333;">Jurnal Sholat Digital</h2>
     
     <div class="tabs">
-        <button class="tab-btn active" onclick="gantiTab('santri')">Menu Santri</button>
+        <button class="tab-btn active" onclick="gantiTab('siswa')">Menu Santri</button>
         <button class="tab-btn" onclick="gantiTab('ortu')">Orang Tua</button>
     </div>
 
-    <div id="form-santri">
+    <div id="form-siswa">
         <div class="form-group">
             <label>Nama Lengkap Ananda (Harus Unik)</label>
-            <input type="text" id="nama-santri" placeholder="Contoh: Syafia">
+            <input type="text" id="nama-siswa" placeholder="Contoh: Syafia">
         </div>
         <div class="form-group">
             <label>Password Akun Anak</label>
-            <input type="password" id="pass-santri" placeholder="••••">
+            <input type="password" id="pass-siswa" placeholder="••••">
         </div>
-        <button class="btn-submit" onclick="prosesLoginSantri()">Masuk / Daftar Jurnal</button>
+        <button class="btn-submit" onclick="prosesLoginSiswa()">Masuk / Daftar Jurnal</button>
     </div>
 
     <div id="form-ortu" style="display: none;">
@@ -52,87 +48,80 @@
             <input type="text" id="nama-anak-ortu" placeholder="Contoh: Syafia">
         </div>
         <div class="form-group">
-            <label>Password Akun Orang Tua</label>
-            <input type="password" id="pass-ortu" placeholder="••••••">
+            <label>Password Khusus Orang Tua</label>
+            <input type="password" id="pass-ortu" placeholder="••••">
         </div>
-        <button class="btn-submit" style="background: var(--secondary);" onclick="prosesLoginOrtu()">Pantau Jurnal Anak</button>
+        <button class="btn-submit" style="background: #198754;" onclick="prosesLoginOrtu()">Pantau Jurnal Ananda</button>
     </div>
-</div>
 
-<div class="loader-overlay" id="loading">
-    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 10px; color: #198754;"></i>
-    <span style="font-weight: 500;">Memeriksa data ke server...</span>
+    <div class="loader" id="loading-login">
+        <i class="fas fa-spinner fa-spin"></i> <span id="text-loading">Memeriksa data ke server...</span>
+    </div>
 </div>
 
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
 
+    // AUTOMATIC LOGIN (Cek Fitur Ingat Saya dari Penyimpanan HP)
+    $(document).ready(function() {
+        let cekSiswa = localStorage.getItem("user_siswa");
+        let cekOrtu = localStorage.getItem("user_ortu");
+        if (cekSiswa) { window.location.href = "sholat.html"; }
+        else if (cekOrtu) { window.location.href = "dashboard_ortu.html"; }
+    });
+
     function gantiTab(tipe) {
-        $(".tab-btn").removeClass("active");
-        if(tipe === 'santri') {
-            $(".tab-btn").eq(0).addClass("active");
-            $("#form-santri").show(); $("#form-ortu").hide();
+        $('.tab-btn').removeClass('active');
+        if (tipe === 'siswa') {
+            $('.tab-btn').first().addClass('active');
+            $('#form-siswa').show(); $('#form-ortu').hide();
         } else {
-            $(".tab-btn").eq(1).addClass("active");
-            $("#form-santri").hide(); $("#form-ortu").show();
+            $('.tab-btn').last().addClass('active');
+            $('#form-siswa').hide(); $('#form-ortu').show();
         }
     }
 
-    function prosesLoginSantri() {
-        let nama = $("#nama-santri").val().trim();
-        let pass = $("#pass-santri").val().trim();
-        if(!nama || !pass) { alert("Nama dan password anak harus diisi!"); return; }
+    function prosesLoginSiswa() {
+        let nm = $("#nama-siswa").val().trim();
+        let pw = $("#pass-siswa").val().trim();
+        if(!nm || !pw) return alert("Nama dan password wajib diisi!");
 
-        $("#loading").css("display", "flex");
-        
+        $("#loading-login").show();
         $.ajax({
-            url: URL_DATABASE,
-            type: "GET",
-            data: { action: "loginSiswa", nama: nama, password: pass },
-            dataType: "jsonp",
-            jsonp: "callback",
+            url: URL_DATABASE, type: "GET",
+            data: { action: "loginSiswa", nama: nm, password: pw },
+            dataType: "jsonp", jsonp: "callback",
             success: function(res) {
-                $("#loading").hide();
+                $("#loading-login").hide();
                 if(res.status === "success") {
+                    // Simpan permanen status login di HP
                     localStorage.setItem("user_siswa", JSON.stringify({ role: "siswa", nama: res.nama }));
                     window.location.href = "sholat.html";
-                } else { 
-                    alert(res.message); 
-                }
+                } else { alert(res.message); }
             },
-            error: function() { 
-                $("#loading").hide(); 
-                alert("Gagal menghubungkan ke web app. Hubungi admin untuk memastikan server aktif."); 
-            }
+            error: function() { $("#loading-login").hide(); alert("Koneksi gagal, periksa Web App Anda."); }
         });
     }
 
     function prosesLoginOrtu() {
-        let namaAnak = $("#nama-anak-ortu").val().trim();
-        let passOrtu = $("#pass-ortu").val().trim();
-        if(!namaAnak || !passOrtu) { alert("Nama anak dan password ortu wajib diisi!"); return; }
+        let nmAnak = $("#nama-anak-ortu").val().trim();
+        let pwOrtu = $("#pass-ortu").val().trim();
+        if(!nmAnak || !pwOrtu) return alert("Nama anak dan password ortu wajib diisi!");
 
-        $("#loading").css("display", "flex");
-        
+        $("#loading-login").show();
         $.ajax({
-            url: URL_DATABASE,
-            type: "GET",
-            data: { action: "loginOrtu", namaAnak: namaAnak, passwordOrtu: passOrtu },
-            dataType: "jsonp",
-            jsonp: "callback",
+            url: URL_DATABASE, type: "GET",
+            data: { action: "loginOrtu", namaAnak: nmAnak, passwordOriginal: "", passwordOrtu: pwOrtu },
+            dataType: "jsonp", jsonp: "callback",
             success: function(res) {
-                $("#loading").hide();
+                $("#loading-login").hide();
                 if(res.status === "success") {
+                    // Simpan permanen status login Ortu di HP
                     localStorage.setItem("user_ortu", JSON.stringify({ role: "ortu", namaAnak: res.namaAnak }));
                     window.location.href = "dashboard_ortu.html";
-                } else { 
-                    alert(res.message); 
-                }
+                } else { alert(res.message); }
             },
-            error: function() { 
-                $("#loading").hide(); 
-                alert("Gagal terhubung ke database server orang tua."); 
-            }
+            error: function() { $("#loading-login").hide(); alert("Gagal menyambungkan ke server."); }
         });
     }
 </script>
