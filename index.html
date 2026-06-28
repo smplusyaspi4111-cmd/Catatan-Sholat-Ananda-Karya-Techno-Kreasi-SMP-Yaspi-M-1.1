@@ -14,9 +14,10 @@
         .tab-btn.active { background: #0f5132; color: white; }
         .form-group { text-align: left; margin-bottom: 15px; }
         label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         .btn-submit { width: 100%; padding: 12px; background: #0f5132; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .loader { display: none; margin: 15px 0; font-size: 14px; color: #0f5132; font-weight: 500; }
+        .box-pendaftaran { background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px dashed #2e7d32; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -32,14 +33,26 @@
 
     <div id="form-siswa">
         <div class="form-group">
-            <label>Nama Lengkap Ananda (Harus Unik)</label>
-            <input type="text" id="nama-siswa" placeholder="Contoh: Syafia">
+            <label>Nama Lengkap Ananda</label>
+            <input type="text" id="nama-siswa" placeholder="Ketik nama di sini..." onblur="periksaAkunTerdaftar()">
         </div>
-        <div class="form-group">
+        
+        <div class="box-pendaftaran" id="area-baru">
+            <p style="margin:0 0 10px 0; font-size:13px; color:#1b5e20; font-weight:bold;"><i class="fas fa-info-circle"></i> Akun baru terdeteksi! Silakan lengkapi jenis kelamin:</p>
+            <div class="form-group">
+                <label>Jenis Kelamin</label>
+                <select id="gender-siswa">
+                    <option value="L">Laki-laki (L)</option>
+                    <option value="P">Perempuan (P)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
             <label>Password Akun Anak</label>
             <input type="password" id="pass-siswa" placeholder="••••">
         </div>
-        <button class="btn-submit" onclick="prosesLoginSiswa()">Masuk / Daftar Jurnal</button>
+        <button class="btn-submit" onclick="prosesLoginSiswa()">Masuk Aplikasi</button>
     </div>
 
     <div id="form-ortu" style="display: none;">
@@ -48,26 +61,24 @@
             <input type="text" id="nama-anak-ortu" placeholder="Contoh: Syafia">
         </div>
         <div class="form-group">
-            <label>Password Khusus Orang Tua</label>
+            <label>Password Orang Tua</label>
             <input type="password" id="pass-ortu" placeholder="••••">
         </div>
         <button class="btn-submit" style="background: #198754;" onclick="prosesLoginOrtu()">Pantau Jurnal Ananda</button>
     </div>
 
     <div class="loader" id="loading-login">
-        <i class="fas fa-spinner fa-spin"></i> <span id="text-loading">Memeriksa data ke server...</span>
+        <i class="fas fa-spinner fa-spin"></i> <span id="text-loading">Memeriksa ke server...</span>
     </div>
 </div>
 
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+    let akunBaruStatus = false;
 
-    // AUTOMATIC LOGIN (Cek Fitur Ingat Saya dari Penyimpanan HP)
     $(document).ready(function() {
-        let cekSiswa = localStorage.getItem("user_siswa");
-        let cekOrtu = localStorage.getItem("user_ortu");
-        if (cekSiswa) { window.location.href = "sholat.html"; }
-        else if (cekOrtu) { window.location.href = "dashboard_ortu.html"; }
+        if (localStorage.getItem("user_siswa")) { window.location.href = "sholat.html"; }
+        else if (localStorage.getItem("user_ortu")) { window.location.href = "dashboard_ortu.html"; }
     });
 
     function gantiTab(tipe) {
@@ -81,47 +92,69 @@
         }
     }
 
+    function periksaAkunTerdaftar() {
+        let nm = $("#nama-siswa").val().trim();
+        if(!nm) return;
+        
+        $("#loading-login").show();
+        $.ajax({
+            url: URL_DATABASE, type: "GET",
+            data: { action: "cekUserSiswa", nama: nm },
+            dataType: "jsonp", jsonp: "callback",
+            success: function(res) {
+                $("#loading-login").hide();
+                if(!res.ditemukan) {
+                    akunBaruStatus = true;
+                    $("#area-baru").slideDown();
+                } else {
+                    akunBaruStatus = false;
+                    $("#area-baru").slideUp();
+                }
+            },
+            error: function() { $("#loading-login").hide(); }
+        });
+    }
+
     function prosesLoginSiswa() {
         let nm = $("#nama-siswa").val().trim();
         let pw = $("#pass-siswa").val().trim();
+        let gd = $("#gender-siswa").val();
         if(!nm || !pw) return alert("Nama dan password wajib diisi!");
 
         $("#loading-login").show();
         $.ajax({
             url: URL_DATABASE, type: "GET",
-            data: { action: "loginSiswa", nama: nm, password: pw },
+            data: { action: "loginSiswa", nama: nm, password: pw, gender: gd, isBaru: akunBaruStatus },
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading-login").hide();
                 if(res.status === "success") {
-                    // Simpan permanen status login di HP
                     localStorage.setItem("user_siswa", JSON.stringify({ role: "siswa", nama: res.nama }));
                     window.location.href = "sholat.html";
                 } else { alert(res.message); }
             },
-            error: function() { $("#loading-login").hide(); alert("Koneksi gagal, periksa Web App Anda."); }
+            error: function() { $("#loading-login").hide(); alert("Koneksi gagal."); }
         });
     }
 
     function prosesLoginOrtu() {
         let nmAnak = $("#nama-anak-ortu").val().trim();
         let pwOrtu = $("#pass-ortu").val().trim();
-        if(!nmAnak || !pwOrtu) return alert("Nama anak dan password ortu wajib diisi!");
+        if(!nmAnak || !pwOrtu) return alert("Wajib diisi lengkap!");
 
         $("#loading-login").show();
         $.ajax({
             url: URL_DATABASE, type: "GET",
-            data: { action: "loginOrtu", namaAnak: nmAnak, passwordOriginal: "", passwordOrtu: pwOrtu },
+            data: { action: "loginOrtu", namaAnak: nmAnak, passwordOrtu: pwOrtu },
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading-login").hide();
                 if(res.status === "success") {
-                    // Simpan permanen status login Ortu di HP
                     localStorage.setItem("user_ortu", JSON.stringify({ role: "ortu", namaAnak: res.namaAnak }));
                     window.location.href = "dashboard_ortu.html";
                 } else { alert(res.message); }
             },
-            error: function() { $("#loading-login").hide(); alert("Gagal menyambungkan ke server."); }
+            error: function() { $("#loading-login").hide(); alert("Koneksi gagal."); }
         });
     }
 </script>
