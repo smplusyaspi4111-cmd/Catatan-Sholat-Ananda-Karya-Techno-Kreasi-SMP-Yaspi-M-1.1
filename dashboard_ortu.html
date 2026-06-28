@@ -7,58 +7,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #0f5132; --secondary: #198754; --bg: #f8f9fa; }
+        :root { --primary: #1e3a8a; --secondary: #0d9488; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
-.header-banner { 
-    background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-    color: white; 
-    padding: 25px 20px; 
-    text-align: center; 
-    /* Tambahan di bawah ini mengatur tata letak tombol dan teks secara fleksibel */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-.btn-keluar { 
-    /* Menghapus position absolute agar tombol tidak melayang kaku */
-    background: #dc3545; 
-    color: white; 
-    border: none; 
-    padding: 8px 15px; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    font-weight: bold; 
-    /* Membuat tombol otomatis bergeser ke kanan atas secara fleksibel */
-    align-self: flex-end; 
-    margin-bottom: -10px;
-}.header-banner { 
-    background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-    color: white; 
-    padding: 25px 20px; 
-    text-align: center; 
-    /* Tambahan di bawah ini mengatur tata letak tombol dan teks secara fleksibel */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-.btn-keluar { 
-    /* Menghapus position absolute agar tombol tidak melayang kaku */
-    background: #dc3545; 
-    color: white; 
-    border: none; 
-    padding: 8px 15px; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    font-weight: bold; 
-    /* Membuat tombol otomatis bergeser ke kanan atas secara fleksibel */
-    align-self: flex-end; 
-    margin-bottom: -10px;
-}
+        
+        .header-banner { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+            padding: 20px 20px 30px 20px; 
+            text-align: center; 
+            /* Mengatur tata letak tombol dan teks secara fleksibel */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-keluar { 
+            background: #dc3545; 
+            color: white; 
+            border: none; 
+            padding: 8px 15px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            /* Membuat tombol otomatis bergeser ke kanan atas secara fleksibel */
+            align-self: flex-end; 
+            margin-bottom: -5px;
+        }
+
         .main-container { max-width: 500px; margin: -20px auto 40px auto; padding: 0 15px; position: relative; z-index: 2; }
         .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .skor-box { text-align: center; background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 10px; }
+        .skor-box { text-align: center; background: #0ec250; padding: 15px; border-radius: 10px; margin-top: 10px; }
         .skor-angka { font-size: 32px; font-weight: bold; color: var(--primary); }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #444; }
@@ -78,9 +57,9 @@
 
 <div class="header-banner">
     <button class="btn-keluar" onclick="logoutOrtu()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
-    <p>Selamat Datang Wali Murid</p>
+    <p style="margin: 0;">Selamat Datang Wali Mudid</p>
     <h2 id="nama-anak-title" style="margin: 5px 0 15px 0;">Nama Anak</h2>
-    <div class="skor-box" style="max-width: 250px; margin: 0 auto; color: #333;">
+    <div class="skor-box" style="width: 100%; max-width: 250px; margin: 0 auto; color: #333;">
         <span style="font-size: 13px; font-weight: 600; color: #555;">Total Akumulasi Skor Hari Ini</span>
         <div class="skor-angka" id="total-skor-display">0 <span style="font-size: 16px;">Poin</span></div>
     </div>
@@ -100,8 +79,7 @@
         <div class="loader" id="loader-ortu">
             <i class="fas fa-spinner fa-spin"></i> Menghubungkan ke server jurnal...
         </div>
-        <div id="box-daftar-laporan">
-            </div>
+        <div id="box-daftar-laporan"></div>
     </div>
 </div>
 
@@ -116,7 +94,6 @@
     $(document).ready(function() {
         $("#nama-anak-title").text(sesiOrtu.namaAnak);
         
-        // Atur default tanggal ke hari ini (Format lokal)
         let hariIni = new Date();
         let yyyy = hariIni.getFullYear();
         let mm = String(hariIni.getMonth() + 1).padStart(2, '0');
