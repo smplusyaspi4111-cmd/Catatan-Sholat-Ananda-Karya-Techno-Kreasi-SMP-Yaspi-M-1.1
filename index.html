@@ -246,8 +246,11 @@
         } else {
           alert("Login Orang Tua Berhasil!");
           
-          // 2. Simpan sesi Orang Tua (jika nanti di dashboard_ortu.html menggunakan proteksi serupa)
-          localStorage.setItem("user_ortu", JSON.stringify({ namaAnak: response.namaAnak }));
+          // 2. SEKARANG SUDAH DITAMBAHKAN role: "ortu" agar tidak mental lagi
+          localStorage.setItem("user_ortu", JSON.stringify({ 
+            namaAnak: response.namaAnak, 
+            role: "ortu" 
+          }));
           
           window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
         }
