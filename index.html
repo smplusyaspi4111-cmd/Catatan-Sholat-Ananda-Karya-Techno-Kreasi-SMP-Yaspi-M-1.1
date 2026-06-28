@@ -194,20 +194,34 @@
       }
     }
 
-    // GANTI URL DI BAWAH INI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT BAPAK!
+   // URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT BAPAK
     var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+    var currentTab = 'santri';
+
+    function setTab(tab) {
+      currentTab = tab;
+      if (tab === 'santri') {
+        $('#btnSantri').addClass('active');
+        $('#btnOrtu').removeClass('active');
+        $('#formSiswa').show();
+        $('#formOrtu').hide();
+      } else {
+        $('#btnOrtu').addClass('active');
+        $('#btnSantri').removeClass('active');
+        $('#formOrtu').show();
+        $('#formSiswa').hide();
+      }
+    }
 
     function prosesMasuk() {
-      var nama, password, action;
+      var nama, password;
       
       if (currentTab === 'santri') {
         nama = $('#namaSiswa').val().trim();
         password = $('#pwSiswa').val().trim();
-        action = "loginSiswa";
       } else {
         nama = $('#namaAnakOrtu').val().trim();
         password = $('#pwOrtu').val().trim();
-        action = "loginOrtu";
       }
 
       if (nama === "" || password === "") {
@@ -215,45 +229,88 @@
         return;
       }
 
-      // Memunculkan efek loading teks ala game
+      // Efek loading text ala Minecraft
       $('#statusServer').text("Menghubungkan ke server Minecraft...").fadeIn();
       $('.minecraft-btn').prop('disabled', true).css('opacity', '0.6');
 
-      // Mengirim data menggunakan JSONP (agar tidak terkena CORS Error)
+      // ==================== JALUR LOGIN ORANG TUA ====================
+      if (currentTab === 'ortu') {
+        $.ajax({
+          url: WEB_APP_URL,
+          type: "GET",
+          dataType: "jsonp",
+          data: {
+            action: "loginOrtu",
+            namaAnak: nama,
+            passwordOrtu: password
+          },
+          success: function(response) {
+            RESET_TOMBOL();
+            if (response.status === "success") {
+              alert("Login Orang Tua Berhasil! Membuka Dashboard Pantauan...");
+              window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
+            } else {
+              alert("Gagal: " + response.message);
+            }
+          },
+          error: function() { RESET_TOMBOL(); AMBIL_EROR(); }
+        });
+        return;
+      }
+
+      // ==================== JALUR LOGIN / DAFTAR SANTRI ====================
+      // Langkah 1: Cek dulu apakah nama anak sudah ada di database Google Sheets
       $.ajax({
         url: WEB_APP_URL,
         type: "GET",
         dataType: "jsonp",
         data: {
-          action: action,
-          nama: nama,         // untuk action loginSiswa
-          namaAnak: nama,     // untuk action loginOrtu
-          password: password, // untuk password anak / voucher
-          passwordOrtu: password, // untuk password ortu
-          isBaru: "true"      // otomatis mengizinkan daftar pakai voucher jika akun belum ada
+          action: "cekUserSiswa",
+          nama: nama
         },
-        success: function(response) {
-          $('#statusServer').fadeOut();
-          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
+        success: function(cekResponse) {
+          // Tentukan apakah user baru atau lama berdasarkan database
+          var isBaruUser = cekResponse.ditemukan ? "false" : "true";
+          var pesanLoading = isBaruUser === "true" ? "Memproses Kode Voucher Baru..." : "Mencocokkan Password Akun...";
+          $('#statusServer').text(pesanLoading);
 
-          if (response.status === "success") {
-            if (currentTab === 'santri') {
-              alert("Selamat! Login/Pendaftaran Berhasil! Membuka Jurnal...");
-              // Mengalihkan santri ke halaman pengisian jurnal sholat
-              window.location.href = "sholat.html?nama=" + encodeURIComponent(response.nama);
-            } else {
-              alert("Login Orang Tua Berhasil! Membuka Dashboard Pantauan...");
-              // Mengalihkan orang tua ke halaman dashboard pemantauan
-              window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
-            }
-          } else {
-            alert("Gagal: " + response.message);
-          }
+          // Langkah 2: Kirim data loginSiswa dengan status isBaru yang tepat
+          $.ajax({
+            url: WEB_APP_URL,
+            type: "GET",
+            dataType: "jsonp",
+            data: {
+              action: "loginSiswa",
+              nama: nama,
+              password: password,
+              gender: "L", // Default gender, bisa disesuaikan nanti
+              isBaru: isBaruUser
+            },
+            success: function(loginResponse) {
+              RESET_TOMBOL();
+              if (loginResponse.status === "success") {
+                if (isBaruUser === "true") {
+                  alert("Selamat! Pendaftaran Akun Berhasil via Voucher!");
+                } else {
+                  alert("Selamat Datang Kembali! Login Berhasil!");
+                }
+                window.location.href = "sholat.html?nama=" + encodeURIComponent(loginResponse.nama);
+              } else {
+                alert("Gagal: " + loginResponse.message);
+              }
+            },
+            error: function() { RESET_TOMBOL(); AMBIL_EROR(); }
+          });
         },
-        error: function() {
-          $('#statusServer').fadeOut();
-          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
-          alert("Gagal menghubungi server Google! Periksa koneksi internet atau URL Deployment Anda.");
-        }
+        error: function() { RESET_TOMBOL(); AMBIL_EROR(); }
       });
+    }
+
+    function RESET_TOMBOL() {
+      $('#statusServer').fadeOut();
+      $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
+    }
+
+    function AMBIL_EROR() {
+      alert("Gagal menghubungi server Google! Periksa koneksi internet atau setelan Deployment script Anda.");
     }
