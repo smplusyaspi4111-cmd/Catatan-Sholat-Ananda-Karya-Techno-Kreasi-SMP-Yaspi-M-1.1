@@ -65,7 +65,6 @@
 </div>
 
 <script>
-    // URL Web App terbaru milik Bapak yang sudah diverifikasi aktif
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
 
     function gantiTab(tipe) {
@@ -86,7 +85,6 @@
 
         $("#loading").css("display", "flex");
         
-        // Menggunakan AJAX JSONP agar tidak diblokir browser
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
@@ -104,7 +102,7 @@
             },
             error: function() { 
                 $("#loading").hide(); 
-                alert("Gagal menghubungkan ke web app. Pastikan setelan Web App adalah 'Anyone'."); 
+                alert("Gagal menghubungkan ke web app. Hubungi admin untuk memastikan server aktif."); 
             }
         });
     }
@@ -116,7 +114,6 @@
 
         $("#loading").css("display", "flex");
         
-        // Menggunakan AJAX JSONP agar tidak diblokir browser
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
