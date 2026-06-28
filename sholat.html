@@ -18,7 +18,9 @@
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .opt-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .opt-btn.selected { background: #198754 !important; color: white !important; border-color: #198754 !important; }
+        .opt-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-submit-utama { width: 100%; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(25,135,84,0.3); }
+        .badge-lock { background: #fc9d03; color: white; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 20px; display: none; }
         .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; color:white; flex-direction:column; z-index:999; }
     </style>
 </head>
@@ -35,7 +37,9 @@
         <p id="tanggal-hari-ini" style="font-weight: bold; color: #666;"></p>
     </div>
     <div id="kontainer-daftar-sholat"></div>
-    <button class="btn-submit-utama" onclick="simpanJurnalKeServer()"><i class="fas fa-save"></i> Simpan Jurnal Ke Server</button>
+    
+    <button class="btn-submit-utama" id="tombol-simpan" onclick="simpanJurnalKeServer()"><i class="fas fa-save"></i> Simpan Jurnal Hari Ini</button>
+    <div class="badge-lock" id="notif-terkunci"><i class="fas fa-lock"></i> Jurnal Hari Ini Sudah Disimpan & Terkunci</div>
 </div>
 
 <div class="loader-overlay" id="loading-siswa">
@@ -49,6 +53,7 @@
 
     let dataPilihanSholat = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
     let jenisKelaminSiswa = "L";
+    let statusKunci = false;
 
     $(document).ready(function() {
         $("#nama-santri-display").text(sesiSiswa.nama);
@@ -69,6 +74,11 @@
                 $("#loading-siswa").hide();
                 if(res.gender) { jenisKelaminSiswa = res.gender; }
                 if(res.dataSholat) { dataPilihanSholat = res.dataSholat; }
+                if(res.terkunci === true) { 
+                    statusKunci = true;
+                    $("#tombol-simpan").hide();
+                    $("#notif-terkunci").show();
+                }
                 renderKartuSholat();
             },
             error: function() { $("#loading-siswa").hide(); renderKartuSholat(); }
@@ -78,16 +88,18 @@
     function renderKartuSholat() {
         let html = "";
         let IsP = (jenisKelaminSiswa === "P");
+        let disabledAttr = statusKunci ? "disabled" : "";
+
         ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"].forEach(w => {
             let v = dataPilihanSholat[w] || 0;
             html += `
                 <div class="sholat-card">
                     <div class="sholat-title"><i class="far fa-clock"></i> Sholat ${w}</div>
                     <div class="options-grid">
-                        <button class="opt-btn ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
-                        <button class="opt-btn ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
-                        <button class="opt-btn ${v===10?'selected':''}" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
-                        <button class="opt-btn ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
+                        <button ${disabledAttr} class="opt-btn ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
+                        <button ${disabledAttr} class="opt-btn ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
+                        <button ${disabledAttr} class="opt-btn ${v===10?'selected':''}" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
+                        <button ${disabledAttr} class="opt-btn ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
                     </div>
                 </div>`;
         });
@@ -95,11 +107,13 @@
     }
 
     function pilih(w, n) {
+        if(statusKunci) return;
         dataPilihanSholat[w] = dataPilihanSholat[w] === n ? 0 : n;
         renderKartuSholat();
     }
 
     function simpanJurnalKeServer() {
+        if(statusKunci) return alert("Jurnal sudah terkunci!");
         $("#loading-siswa").css("display", "flex");
         let d = new Date();
         let tglKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -110,7 +124,12 @@
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading-siswa").hide();
-                alert("Alhamdulillah, jurnal sholat hari ini berhasil disimpan!");
+                if (res.status === "error") {
+                    alert(res.message);
+                } else {
+                    alert("Alhamdulillah, jurnal sholat hari ini berhasil disimpan!");
+                    location.reload(); // Reload untuk langsung mengunci tombol
+                }
             },
             error: function() { $("#loading-siswa").hide(); alert("Gagal menyambungkan ke server."); }
         });
