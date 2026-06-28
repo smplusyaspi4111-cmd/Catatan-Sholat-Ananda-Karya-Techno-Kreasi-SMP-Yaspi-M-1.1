@@ -18,10 +18,11 @@
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .opt-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .opt-btn.selected { background: #198754 !important; color: white !important; border-color: #198754 !important; }
-        .opt-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #eee; color: #999; }
+        .opt-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #eaedf0; color: #a1a1a1; border-color: #d1d5db; }
         .btn-submit-utama { width: 100%; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(25,135,84,0.3); }
         .badge-belum-waktunya { color: #dc3545; font-size: 12px; font-weight: bold; background: #f8d7da; padding: 4px 8px; border-radius: 5px; }
         .badge-siap { color: #198754; font-size: 12px; font-weight: bold; background: #d1e7dd; padding: 4px 8px; border-radius: 5px; }
+        .badge-terkunci { color: #495057; font-size: 12px; font-weight: bold; background: #e9ecef; padding: 4px 8px; border-radius: 5px; }
         .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; color:white; flex-direction:column; z-index:999; }
     </style>
 </head>
@@ -52,10 +53,10 @@
     if (!sesiSiswa) { window.location.href = "index.html"; }
 
     let dataPilihanSholat = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
+    let dataTerbacaDariServer = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
     let jenisKelaminSiswa = "L";
 
     // ==================== ATURAN JAM MASUK SHOLAT ====================
-    // Bapak bisa sesuaikan jam menit ini dengan jadwal sholat lokal (Format: JAM, MENIT)
     const JADWAL_SHOLAT = {
         "Subuh":  { jam: 4,  menit: 30 },
         "Zuhur":  { jam: 12, menit: 15 },
@@ -82,7 +83,10 @@
             success: function(res) {
                 $("#loading-siswa").hide();
                 if(res.gender) { jenisKelaminSiswa = res.gender; }
-                if(res.dataSholat) { dataPilihanSholat = res.dataSholat; }
+                if(res.dataSholat) { 
+                    dataPilihanSholat = { ...res.dataSholat }; 
+                    dataTerbacaDariServer = { ...res.dataSholat }; 
+                }
                 renderKartuSholat();
             },
             error: function() { $("#loading-siswa").hide(); renderKartuSholat(); }
@@ -97,7 +101,7 @@
         target.setMinutes(JADWAL_SHOLAT[namaSholat].menit);
         target.setSeconds(0);
 
-        return sekarang >= target; // True jika jam sekarang sudah melewati jam masuk sholat
+        return sekarang >= target;
     }
 
     function renderKartuSholat() {
@@ -106,15 +110,31 @@
 
         ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"].forEach(w => {
             let v = dataPilihanSholat[w] || 0;
-            let sudahWaktunya = cekApakahSudahMasukWaktu(w);
-            let disabledAttr = sudahWaktunya ? "" : "disabled";
+            let nilaiAsliServer = dataTerbacaDariServer[w] || 0;
             
-            let statusBadge = sudahWaktunya 
-                ? `<span class="badge-sidebar badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>` 
-                : `<span class="badge-sidebar badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`;
+            let sudahWaktunya = cekApakahSudahMasukWaktu(w);
+            let sudahTerisiDiServer = nilaiAsliServer > 0; // Deteksi pengunci otomatis
+            
+            let disabledAttr = (sudahWaktunya && !sudahTerisiDiServer) ? "" : "disabled";
+            
+            let statusBadge = "";
+            if (sudahTerisiDiServer) {
+                statusBadge = `<span class="badge-terkunci"><i class="fas fa-lock"></i> Terkunci</span>`;
+            } else if (sudahWaktunya) {
+                statusBadge = `<span class="badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>`;
+            } else {
+                statusBadge = `<span class="badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`;
+            }
+
+            let borderStyle = "";
+            if (sudahTerisiDiServer) {
+                borderStyle = "border-left-color: #6c757d; background: #f1f3f5;";
+            } else if (!sudahWaktunya) {
+                borderStyle = "border-left-color: #dc3545; background: #fafafa;";
+            }
 
             html += `
-                <div class="sholat-card" style="${!sudahWaktunya ? 'border-left-color: #dc3545; background: #fafafa;' : ''}">
+                <div class="sholat-card" style="${borderStyle}">
                     <div class="sholat-title">
                         <span><i class="far fa-clock"></i> Sholat ${w}</span>
                         ${statusBadge}
@@ -122,7 +142,7 @@
                     <div class="options-grid">
                         <button ${disabledAttr} class="opt-btn ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
                         <button ${disabledAttr} class="opt-btn ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
-                        <button ${disabledAttr} class="opt-btn ${v===10?'selected':''}" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
+                        <button ${disabledAttr} class="opt-btn ${v===10?'selected':''}" onclick="pilled('${w}',10)" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
                         <button ${disabledAttr} class="opt-btn ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
                     </div>
                 </div>`;
@@ -132,6 +152,8 @@
 
     function pilih(w, n) {
         if (!cekApakahSudahMasukWaktu(w)) return alert("Belum masuk waktu sholat ini!");
+        if (dataTerbacaDariServer[w] > 0) return alert("Waktu sholat ini sudah terkunci dan tidak bisa diubah!");
+        
         dataPilihanSholat[w] = dataPilihanSholat[w] === n ? 0 : n;
         renderKartuSholat();
     }
@@ -151,7 +173,7 @@
                     alert(res.message);
                 } else {
                     alert("Alhamdulillah, jurnal sholat Anda berhasil diperbarui!");
-                    ambilRiwayatHariIni(); // Muat ulang data terbaru tanpa mengunci paksa
+                    ambilRiwayatHariIni();
                 }
             },
             error: function() { $("#loading-siswa").hide(); alert("Gagal menyambungkan ke server."); }
