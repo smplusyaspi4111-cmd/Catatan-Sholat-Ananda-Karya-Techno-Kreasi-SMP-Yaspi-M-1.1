@@ -12,18 +12,40 @@
         .header-nav { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .btn-keluar { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .main-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .welcome-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
+        
+        /* --- KARTU USER DENGAN KAMERA MANDIRI --- */
+        .welcome-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+        .profile-frame { width: 90px; height: 90px; border-radius: 10px; border: 3px solid #dc3545; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #f1f3f5; flex-shrink: 0; cursor: pointer; position: relative; }
+        .profile-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-frame .overlay-pilih { display: none; position: absolute; background: rgba(0,0,0,0.5); color: white; width: 100%; height: 100%; text-align: center; font-size: 10px; flex-direction: column; justify-content: center; align-items: center; }
+        .profile-frame:hover .overlay-pilih { display: flex; }
+        
+        .welcome-text { flex-grow: 1; text-align: left; }
+        .welcome-text h3 { margin: 0 0 5px 0; font-size: 18px; color: #333; }
+        .welcome-text p { margin: 0 0 5px 0; font-weight: bold; color: #666; font-size: 13px; }
+        .score-badge { font-size: 12px; font-weight: bold; color: var(--primary); background: #e8f5e9; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+
+        /* KARTU SHOLAT */
         .sholat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid var(--secondary); position: relative; }
-        .sholat-title { font-size: 17px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .sholat-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* FORMAT GRID TOMBOL WARNA-WARNI */
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .opt-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; }
-        .opt-btn.selected { background: #198754 !important; color: white !important; border-color: #198754 !important; }
-        .opt-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #eaedf0; color: #a1a1a1; border-color: #d1d5db; }
-        .btn-submit-utama { width: 100%; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 12px rgba(25,135,84,0.3); }
+        .opt-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; color: #333; }
+        
+        .opt-btn.btn-uzur.selected { background: #ff92c2 !important; color: white !important; border-color: #ff92c2 !important; }
+        .opt-btn.btn-awal.selected { background: #198754 !important; color: white !important; border-color: #198754 !important; }
+        .opt-btn.btn-tengah.selected { background: #ffeb3b !important; color: #333 !important; border-color: #ffeb3b !important; }
+        .opt-btn.btn-akhir.selected { background: #dc3545 !important; color: white !important; border-color: #dc3545 !important; }
+        
+        .opt-btn:disabled { opacity: 0.3; cursor: not-allowed; background: #f0f0f0; color: #aaa; }
+        .opt-btn.selected:disabled { opacity: 1 !important; }
+
+        .btn-submit-utama { width: 100%; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .badge-belum-waktunya { color: #dc3545; font-size: 12px; font-weight: bold; background: #f8d7da; padding: 4px 8px; border-radius: 5px; }
         .badge-siap { color: #198754; font-size: 12px; font-weight: bold; background: #d1e7dd; padding: 4px 8px; border-radius: 5px; }
         .badge-terkunci { color: #495057; font-size: 12px; font-weight: bold; background: #e9ecef; padding: 4px 8px; border-radius: 5px; }
-        .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; color:white; flex-direction:column; z-index:999; }
+        .loader-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; color:white; z-index:999; }
     </style>
 </head>
 <body>
@@ -35,16 +57,27 @@
 
 <div class="main-container">
     <div class="welcome-card">
-        <h3>Assalamu'alaikum, <span id="nama-santri-display"></span></h3>
-        <p id="tanggal-hari-ini" style="font-weight: bold; color: #666;"></p>
+        <input type="file" id="input-foto" accept="image/*" style="display: none;" onchange="prosesFotoBaru(this)">
+        <div class="profile-frame" onclick="$('#input-foto').click();">
+            <div id="wrapper-foto-tampil" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+                <i class="fas fa-camera fa-2x" style="color: #ccc;"></i>
+            </div>
+            <div class="overlay-pilih"><i class="fas fa-edit"></i><br>Foto</div>
+        </div>
+        <div class="welcome-text">
+            <h3>Assalamu'alaikum, <span id="nama-santri-display"></span></h3>
+            <p id="tanggal-hari-ini">Memuat Tanggal...</p>
+            <div class="score-badge">Score Hari Ini: <span id="skor-santri-hari-ini">0</span> Poin</div>
+        </div>
     </div>
+    
     <div id="kontainer-daftar-sholat"></div>
     
     <button class="btn-submit-utama" id="tombol-simpan" onclick="simpanJurnalKeServer()"><i class="fas fa-save"></i> Perbarui / Simpan Jurnal</button>
 </div>
 
 <div class="loader-overlay" id="loading-siswa">
-    <i class="fas fa-spinner fa-spin fa-2x"></i> <p style="margin-top:10px;">Menghubungkan ke database...</p>
+    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i> <p>Sinkronisasi Jadwal Medan & Server...</p></div>
 </div>
 
 <script>
@@ -52,27 +85,53 @@
     let sesiSiswa = JSON.parse(localStorage.getItem("user_siswa"));
     if (!sesiSiswa) { window.location.href = "index.html"; }
 
-    let dataPilihanSholat = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
-    let dataTerbacaDariServer = { "Subuh": 0, "Zuhur": 0, "Asar": 0, "Magrib": 0, "Isya": 0 };
+    let dataPilihanSholat = { "Fajr": 0, "Dhuhr": 0, "Asr": 0, "Maghrib": 0, "Isya": 0 };
+    let dataTerbacaDariServer = { "Fajr": 0, "Dhuhr": 0, "Asr": 0, "Maghrib": 0, "Isya": 0 };
+    let jadwalApiMedan = {}; 
     let jenisKelaminSiswa = "L";
 
-    // ==================== ATURAN JAM MASUK SHOLAT ====================
-    const JADWAL_SHOLAT = {
-        "Subuh":  { jam: 4,  menit: 30 },
-        "Zuhur":  { jam: 12, menit: 15 },
-        "Asar":   { jam: 15, menit: 30 },
-        "Magrib": { jam: 18, menit: 20 },
-        "Isya":   { jam: 19, menit: 30 }
-    };
+    // Peta Nama API ke Nama Indonesia untuk Tampilan Screen
+    const INDO_NAME = { "Fajr": "Subuh", "Dhuhr": "Zuhur", "Asr": "Asar", "Maghrib": "Magrib", "Isya": "Isya" };
 
     $(document).ready(function() {
         $("#nama-santri-display").text(sesiSiswa.nama);
         $("#tanggal-hari-ini").text(new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-        ambilRiwayatHariIni();
+        
+        muatFotoProfilLokal();
+        muatJadwalSholatMedanAPI();
     });
 
-    function ambilRiwayatHariIni() {
+    // FUNGSI API JADWAL SHOLAT MEDAN OTOMATIS
+    function muatJadwalSholatMedanAPI() {
         $("#loading-siswa").css("display", "flex");
+        // Memanggil API Aladhan berdasarkan koordinat/kota Medan
+        $.getJSON("https://api.aladhan.com/v1/timingsByCity?city=Medan&country=Indonesia&method=2", function(data) {
+            if(data && data.data.timings) {
+                jadwalApiMedan = data.data.timings;
+                ambilRiwayatHariIni();
+            } else {
+                alert("Gagal memuat jadwal sholat otomatis.");
+            }
+        }).fail(function() { alert("Gagal terhubung ke server jadwal sholat."); });
+    }
+
+    function muatFotoProfilLokal() {
+        let saved = localStorage.getItem("foto_profil_" + sesiSiswa.nama);
+        if (saved) $("#wrapper-foto-tampil").html(`<img src="${saved}">`);
+    }
+
+    function prosesFotoBaru(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                localStorage.setItem("foto_profil_" + sesiSiswa.nama, e.target.result);
+                $("#wrapper-foto-tampil").html(`<img src="${e.target.result}">`);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function ambilRiwayatHariIni() {
         let d = new Date();
         let tglKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
@@ -83,24 +142,24 @@
             success: function(res) {
                 $("#loading-siswa").hide();
                 if(res.gender) { jenisKelaminSiswa = res.gender; }
-                if(res.dataSholat) { 
-                    dataPilihanSholat = { ...res.dataSholat }; 
-                    dataTerbacaDariServer = { ...res.dataSholat }; 
+                if(res.dataSholat) {
+                    // Sinkronisasi data nama sholat dari database lama Bapak
+                    dataPilihanSholat = { "Fajr": res.dataSholat.Subuh||0, "Dhuhr": res.dataSholat.Zuhur||0, "Asr": res.dataSholat.Asar||0, "Maghrib": res.dataSholat.Magrib||0, "Isya": res.dataSholat.Isya||0 };
+                    dataTerbacaDariServer = { ...dataPilihanSholat };
                 }
+                if(res.akumulasiSkor !== undefined) { $("#skor-santri-hari-ini").text(res.akumulasiSkor); }
                 renderKartuSholat();
             },
             error: function() { $("#loading-siswa").hide(); renderKartuSholat(); }
         });
     }
 
-    function cekApakahSudahMasukWaktu(namaSholat) {
+    function cekSudahMasukWaktu(jamMenitTarget) {
+        if(!jamMenitTarget) return false;
         let sekarang = new Date();
+        let [jam, menit] = jamMenitTarget.split(":");
         let target = new Date();
-        
-        target.setHours(JADWAL_SHOLAT[namaSholat].jam);
-        target.setMinutes(JADWAL_SHOLAT[namaSholat].menit);
-        target.setSeconds(0);
-
+        target.setHours(parseInt(jam), parseInt(menit), 0);
         return sekarang >= target;
     }
 
@@ -108,42 +167,31 @@
         let html = "";
         let IsP = (jenisKelaminSiswa === "P");
 
-        ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"].forEach(w => {
+        ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isya"].forEach(w => {
+            let jamMasuk = jadwalApiMedan[w]; // Jam Ambil Realtime dari API
             let v = dataPilihanSholat[w] || 0;
             let nilaiAsliServer = dataTerbacaDariServer[w] || 0;
             
-            let sudahWaktunya = cekApakahSudahMasukWaktu(w);
-            let sudahTerisiDiServer = nilaiAsliServer > 0; // Deteksi pengunci otomatis
-            
+            let sudahWaktunya = cekSudahMasukWaktu(jamMasuk);
+            let sudahTerisiDiServer = nilaiAsliServer > 0;
             let disabledAttr = (sudahWaktunya && !sudahTerisiDiServer) ? "" : "disabled";
             
-            let statusBadge = "";
-            if (sudahTerisiDiServer) {
-                statusBadge = `<span class="badge-terkunci"><i class="fas fa-lock"></i> Terkunci</span>`;
-            } else if (sudahWaktunya) {
-                statusBadge = `<span class="badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>`;
-            } else {
-                statusBadge = `<span class="badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`;
-            }
-
-            let borderStyle = "";
-            if (sudahTerisiDiServer) {
-                borderStyle = "border-left-color: #6c757d; background: #f1f3f5;";
-            } else if (!sudahWaktunya) {
-                borderStyle = "border-left-color: #dc3545; background: #fafafa;";
-            }
+            let statusBadge = sudahTerisiDiServer ? `<span class="badge-terkunci"><i class="fas fa-lock"></i> Terkunci</span>` : 
+                              (sudahWaktunya ? `<span class="badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>` : 
+                              `<span class="badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`);
 
             html += `
-                <div class="sholat-card" style="${borderStyle}">
+                <div class="sholat-card" style="${sudahTerisiDiServer ? 'border-left-color:#6c757d;' : (!sudahWaktunya ? 'border-left-color:#dc3545;' : '')}">
                     <div class="sholat-title">
-                        <span><i class="far fa-clock"></i> Sholat ${w}</span>
+                        <!-- MENAMPILKAN JAM REALTIME NYA DI SINI -->
+                        <span><i class="far fa-clock"></i> ${INDO_NAME[w]} - ${jamMasuk || '--:--'}</span>
                         ${statusBadge}
                     </div>
                     <div class="options-grid">
-                        <button ${disabledAttr} class="opt-btn ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
-                        <button ${disabledAttr} class="opt-btn ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
-                        <button ${disabledAttr} class="opt-btn ${v===10?'selected':''}" onclick="pilled('${w}',10)" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
-                        <button ${disabledAttr} class="opt-btn ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
+                        <button ${disabledAttr} class="opt-btn btn-uzur ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
+                        <button ${disabledAttr} class="opt-btn btn-awal ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
+                        <button ${disabledAttr} class="opt-btn btn-tengah ${v===10?'selected':''}" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
+                        <button ${disabledAttr} class="opt-btn btn-akhir ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
                     </div>
                 </div>`;
         });
@@ -151,9 +199,8 @@
     }
 
     function pilih(w, n) {
-        if (!cekApakahSudahMasukWaktu(w)) return alert("Belum masuk waktu sholat ini!");
-        if (dataTerbacaDariServer[w] > 0) return alert("Waktu sholat ini sudah terkunci dan tidak bisa diubah!");
-        
+        if (!cekSudahMasukWaktu(jadwalApiMedan[w])) return alert("Belum masuk waktu sholat!");
+        if (dataTerbacaDariServer[w] > 0) return alert("Sudah terkunci!");
         dataPilihanSholat[w] = dataPilihanSholat[w] === n ? 0 : n;
         renderKartuSholat();
     }
@@ -163,27 +210,23 @@
         let d = new Date();
         let tglKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
+        // Mengembalikan nama kunci ke format lama Sheets Bapak sebelum dikirim
+        let dataKirim = { "Subuh": dataPilihanSholat.Fajr, "Zuhur": dataPilihanSholat.Dhuhr, "Asar": dataPilihanSholat.Asr, "Magrib": dataPilihanSholat.Maghrib, "Isya": dataPilihanSholat.Isya };
+
         $.ajax({
             url: URL_DATABASE, type: "GET",
-            data: { action: "simpanJurnalSiswa", nama: sesiSiswa.nama, tanggal: tglKey, nilaiJson: JSON.stringify(dataPilihanSholat) },
+            data: { action: "simpanJurnalSiswa", nama: sesiSiswa.nama, tanggal: tglKey, nilaiJson: JSON.stringify(dataKirim) },
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading-siswa").hide();
-                if (res.status === "error") {
-                    alert(res.message);
-                } else {
-                    alert("Alhamdulillah, jurnal sholat Anda berhasil diperbarui!");
-                    ambilRiwayatHariIni();
-                }
+                if (res.status === "error") { alert(res.message); } 
+                else { alert("Jurnal sholat Anda berhasil disimpan!"); muatJadwalSholatMedanAPI(); }
             },
             error: function() { $("#loading-siswa").hide(); alert("Gagal menyambungkan ke server."); }
         });
     }
 
-    function logoutSiswa() {
-        localStorage.removeItem("user_siswa");
-        window.location.href = "index.html";
-    }
+    function logoutSiswa() { localStorage.removeItem("user_siswa"); window.location.href = "index.html"; }
 </script>
 </body>
 </html>
