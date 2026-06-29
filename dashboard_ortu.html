@@ -92,24 +92,41 @@
     }
 
     $(document).ready(function() {
-        $("#nama-anak-title").text(sesiOrtu.namaAnak);
-        
-        let hariIni = new Date();
-        let yyyy = hariIni.getFullYear();
-        let mm = String(hariIni.getMonth() + 1).padStart(2, '0');
-        let dd = String(hariIni.getDate()).padStart(2, '0');
-        $("#input-tanggal-cari").val(`${yyyy}-${mm}-${dd}`);
-        
-        loadDataLaporanOrtu();
-    });
+    // 1. AMBIL SESSION DATA ORANG TUA YANG DIKIRIM OLEH INDEX.HTML
+    let dataSesiMentah = localStorage.getItem("user_ortu");
+    
+    // 2. CEK APAKAH USER BENAR-BENAR SUDAH LOGIN ATAU BELUM
+    if (!dataSesiMentah) {
+        alert("Akses ditolak! Silakan login terlebih dahulu melalui Menu Orang Tua.");
+        window.location.href = "index.html";
+        return; // Hentikan eksekusi kode di bawah jika belum login
+    }
+    
+    // 3. PARSE DATA JIKA ADA, LALU MASUKKAN KE VARIABEL sesiOrtu
+    let sesiOrtu = JSON.parse(dataSesiMentah);
 
-    function loadDataLaporanOrtu() {
-        let tanggalMentah = $("#input-tanggal-cari").val();
-        if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
+    // 4. TAMPILKAN NAMA ANAK DI JUDUL DASHBOARD
+    $("#nama-anak-title").text(sesiOrtu.namaAnak);
+    
+    // 5. ATUR TANGGAL OTOMATIS HARI INI
+    let hariIni = new Date();
+    let yyyy = hariIni.getFullYear();
+    let mm = String(hariIni.getMonth() + 1).padStart(2, '0');
+    let dd = String(hariIni.getDate()).padStart(2, '0');
+    $("#input-tanggal-cari").val(`${yyyy}-${mm}-${dd}`);
+    
+    // 6. JALANKAN PROSES LOAD DATA LAPORAN
+    loadDataLaporanOrtu();
+});
 
-        $("#loader-ortu").show();
-        $("#box-daftar-laporan").empty();
+function loadDataLaporanOrtu() {
+    let tanggalMentah = $("#input-tanggal-cari").val();
+    if (!tanggalMentah) { alert("Pilih tanggal terlebih dahulu!"); return; }
 
+    $("#loader-ortu").show();
+    $("#box-daftar-laporan").empty();
+    
+    // Tulis kelanjutan kode fungsi AJAX load data Bapak di bawah ini...
         $.ajax({
             url: URL_DATABASE,
             type: "GET",
