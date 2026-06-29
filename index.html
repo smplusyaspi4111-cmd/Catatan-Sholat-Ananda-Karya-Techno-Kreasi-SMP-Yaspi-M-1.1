@@ -210,7 +210,7 @@
             $.ajax({
                 url: URL_DATABASE, type: "GET",
                 data: { action: "loginSiswa", nama: nama, password: voucher },
-                dataType: "jsonp", jsonp: "callback",
+                dataType: "jsonp", jsonp: "callback", timeout: 8000,
                 success: function(res) {
                     $("#loading").hide();
                     if(res.status === "success") {
@@ -222,6 +222,26 @@
                 },
                 error: function() { $("#loading").hide(); alert("Koneksi gagal ke server database."); }
             });
+        } else {
+            // LOGIN ORANG TUA
+            $.ajax({
+                url: URL_DATABASE, type: "GET",
+                data: { action: "loginOrtu", namaAnak: nama, passwordOrtu: voucher },
+                dataType: "jsonp", jsonp: "callback", timeout: 8000,
+                success: function(res) {
+                    $("#loading").hide();
+                    if(res.status === "success") {
+                        // Menggunakan res.namaAnak agar nama yang disimpan 100% resmi sesuai database Sheets
+                        localStorage.setItem("user_ortu", JSON.stringify({ namaAnak: res.namaAnak }));
+                        window.location.href = "dashboard_ortu.html"; 
+                    } else {
+                        alert("Gagal Masuk Ortu: " + res.message);
+                    }
+                },
+                error: function() { $("#loading").hide(); alert("Koneksi gagal saat memverifikasi data Ortu."); }
+            });
+        }
+    }
         } else {
             // LOGIN ORANG TUA
             $.ajax({
