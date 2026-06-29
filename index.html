@@ -143,7 +143,7 @@
     <!-- TOMBOL PILIHAN MENU ANANDA / ORANG TUA -->
     <div class="tab-grid">
         <button class="tab-btn active" id="btn-ananda">Menu Ananda</button>
-        <button class="tab-btn" id="btn-ortu" onclick="alert('Menu Orang Tua dalam pengembangan!')">Orang Tua</button>
+        <button class="tab-btn" id="bind-ortu" id="btn-ortu">Orang Tua</button>
     </div>
 
     <!-- FORM INPUT LOGIN -->
@@ -162,9 +162,9 @@
 <div class="loader-overlay" id="loading">
     <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Memeriksa Kode Voucher...</p></div>
 </div>
-
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+    let modeLogin = "ananda"; // Mode default saat aplikasi dibuka
 
     $(document).ready(function() {
         // MENJALANKAN JAM DIGITAL REALTIME
@@ -176,32 +176,74 @@
             $("#live-date").text(hari + ", " + tgl);
             $("#live-clock").text(d.toLocaleTimeString('id-ID', { hour12: false }));
         }, 1000);
+
+        // EVENT INTERAKSI TOMBOL MENU TAB
+        $("#btn-ananda").click(function() {
+            modeLogin = "ananda";
+            $(this).addClass("active");
+            $("#btn-ortu").removeClass("active");
+            
+            // Ubah Label teks Form untuk Ananda
+            $("label[for='input-nama']").text("Nama Lengkap Ananda:");
+            $("label[for='input-voucher']").text("Kode Voucher / Password:");
+            $("#input-nama").attr("placeholder", "Contoh: Fia Can");
+        });
+
+        $("#btn-ortu").click(function() {
+            modeLogin = "ortu";
+            $(this).addClass("active");
+            $("#btn-ananda").removeClass("active");
+            
+            // Ubah Label teks Form untuk Orang Tua
+            $("label[for='input-nama']").text("Nama Lengkap Ananda:");
+            $("label[for='input-voucher']").text("Password Orang Tua:");
+            $("#input-nama").attr("placeholder", "Contoh: Fia Can");
+        });
     });
 
     function prosesLoginSatri() {
         let nama = $("#input-nama").val().trim();
         let voucher = $("#input-voucher").val().trim();
 
-        if(!nama || !voucher) return alert("Nama dan Kode Voucher wajib diisi!");
+        if(!nama || !voucher) return alert("Semua kolom input wajib diisi!");
 
         $("#loading").css("display", "flex");
 
-        $.ajax({
-            url: URL_DATABASE, type: "GET",
-            data: { action: "loginSiswa", nama: nama, password: voucher },
-            dataType: "jsonp", jsonp: "callback",
-            success: function(res) {
-                $("#loading").hide();
-                if(res.status === "success") {
-                    localStorage.setItem("user_siswa", JSON.stringify({ nama: nama, voucher: voucher }));
-                    window.location.href = "sholat.html";
-                } else {
-                    alert("Gagal Masuk: " + res.message);
-                }
-            },
-            error: function() { $("#loading").hide(); alert("Koneksi gagal atau voucher salah."); }
-        });
+        if (modeLogin === "ananda") {
+            // LOGIN SISI ANANDA
+            $.ajax({
+                url: URL_DATABASE, type: "GET",
+                data: { action: "loginSiswa", nama: nama, password: voucher },
+                dataType: "jsonp", jsonp: "callback",
+                success: function(res) {
+                    $("#loading").hide();
+                    if(res.status === "success") {
+                        localStorage.setItem("user_siswa", JSON.stringify({ nama: nama, voucher: voucher }));
+                        window.location.href = "sholat.html";
+                    } else {
+                        alert("Gagal Masuk: " + res.message);
+                    }
+                },
+                error: function() { $("#loading").hide(); alert("Koneksi gagal ke server database."); }
+            });
+        } else {
+            // LOGIN SISI ORANG TUA (Menghubungkan ke action loginOrtu di Apps Script Bapak)
+            $.ajax({
+                url: URL_DATABASE, type: "GET",
+                data: { action: "loginOrtu", namaAnak: nama, passwordOrtu: voucher },
+                dataType: "jsonp", jsonp: "callback",
+                success: function(res) {
+                    $("#loading").hide();
+                    if(res.status === "success") {
+                        localStorage.setItem("user_ortu", JSON.stringify({ namaAnak: nama }));
+                        // Mengarah ke file dashboard_ortu.html yang sudah Bapak buat di GitHub!
+                        window.location.href = "dashboard_ortu.html"; 
+                    } else {
+                        alert("Gagal Masuk Ortu: " + res.message);
+                    }
+                },
+                error: function() { $("#loading").hide(); alert("Koneksi gagal saat memverifikasi data Ortu."); }
+            });
+        }
     }
 </script>
-</body>
-</html>
