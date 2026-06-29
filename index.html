@@ -1,271 +1,207 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerbang Jurnal Sholat Digital</title>
-  <!-- Mengambil Font Pixel ala Minecraft -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  
-  <style>
-    /* 1. LATAR BELAKANG THEMA MINECRAFT CHERRY BLOSSOM */
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      /* Gambar pemandangan pixelated mnc sebagai latar belakang */
-      background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), 
-                  url('https://images.unsplash.com/photo-1627856013091-fed6e4e30025?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
-      background-size: cover;
-    }
-
-    /* 2. KOTAK CONTAINER UTAMA */
-    .minecraft-container {
-      background: rgba(16, 16, 16, 0.85); /* Hitam transparan khas menu Minecraft */
-      border: 4px solid #3c3c3c;
-      outline: 4px solid #000000;
-      padding: 30px 20px;
-      width: 90%;
-      max-width: 420px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-    }
-
-    /* 3. JUDUL GAME (JURNAL SHOLAT) */
-    .minecraft-title {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 14px;
-      color: #FFFF55; /* Warna Kuning Terang khas splash text Minecraft */
-      text-shadow: 3px 3px #3F3F00;
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
-
-    /* 4. TOMBOL MENU TAB (SANTRI / ORANG TUA) */
-    .tab-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 25px;
-    }
-    
-    .tab-btn {
-      flex: 1;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
-      color: #E0E0E0;
-      background: #555555;
-      border: 2px solid #A8A8A8;
-      border-bottom: 4px solid #000000;
-      border-right: 4px solid #000000;
-      padding: 12px 5px;
-      cursor: pointer;
-    }
-
-    .tab-btn.active {
-      background: #3c8527; /* Hijau Rumput Aktif */
-      border-color: #55FF55;
-      color: #FFFFFF;
-    }
-
-    /* 5. GAYA INPUT FORM KOTAK-KOTAK */
-    .form-group {
-      text-align: left;
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 9px;
-      color: #AAAAAA;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .minecraft-input {
-      width: 100%;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 15px;
-      background: #000000;
-      border: 2px solid #555555;
-      color: #00FF00; /* Tulisan Hijau Komputer di dalam Input */
-      padding: 12px;
-      outline: none;
-    }
-    
-    .minecraft-input:focus {
-      border-color: #FFFF55; /* Border jadi kuning saat diklik */
-    }
-
-    /* 6. TOMBOL MASUK UTAMA MC STYLE (3D GRAY BUTTON) */
-    .minecraft-btn {
-      width: 100%;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 11px;
-      color: #E0E0E0;
-      background: #767676;
-      border: 3px solid #A8A8A8;
-      border-bottom: 5px solid #000000;
-      border-right: 5px solid #000000;
-      padding: 15px;
-      cursor: pointer;
-      text-shadow: 2px 2px #3F3F3F;
-      margin-top: 15px;
-    }
-
-    .minecraft-btn:hover {
-      background: #8c8c8c;
-      border-color: #c1c1c1;
-      color: #FFFF55;
-    }
-
-    .minecraft-btn:active {
-      border-bottom: 2px solid #A8A8A8;
-      border-right: 3px solid #A8A8A8;
-      margin-top: 18px;
-      margin-bottom: -3px;
-    }
-    
-    /* Loading text ala Minecraft */
-    .status-text {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 9px;
-      color: #55FFFF;
-      margin-top: 15px;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal Sholat Digital - Masuk</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #222 url('https://www.transparenttextures.com/patterns/black-thread.png');
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #111;
+            border: 4px solid #444;
+            padding: 25px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+        /* --- KOTAK HEADER DUA KOLOM (JAM & JUDUL) --- */
+        .header-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .time-box {
+            border: 2px solid #8B5A2B; /* Kotak Cokelat */
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #d4a373;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .time-box #live-clock {
+            font-weight: bold;
+            font-size: 13px;
+            color: #fff;
+            display: block;
+            margin-top: 3px;
+        }
+        .title-app {
+            color: #FFFF00; /* Kuning Retro */
+            font-size: 18px;
+            font-weight: bold;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* TAB BUTTONS */
+        .tab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #444;
+            color: #aaa;
+            border: 2px solid #555;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+        }
+        .tab-btn.active {
+            background: #2e7d32; /* Hijau Terang */
+            color: #fff;
+            border-color: #4caf50;
+        }
+        
+        /* FORM STYLING */
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #bbb;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #eef2f7;
+            border: 2px solid #333;
+            color: #000;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: #fff;
+            border: 3px double #777;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background: #444;
+            border-color: #fff;
+        }
+        .loader-overlay {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:99;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="minecraft-container">
-    <div class="minecraft-title">JURNAL SHOLAT<br>DIGITAL V1.1</div>
-    
-    <div class="tab-group">
-      <button class="tab-btn active" id="btnSantri" onclick="setTab('santri')">Menu Ananda</button>
-      <button class="tab-btn" id="btnOrtu" onclick="setTab('ortu')">Orang Tua</button>
+<div class="login-container">
+    <!-- GRID HEADER SESUAI GAMBAR PAINT BAPAK -->
+    <div class="header-grid">
+        <div class="time-box">
+            <span id="live-date">Memuat...</span>
+            <span id="live-clock">00:00:00</span>
+        </div>
+        <div class="title-app">
+            Jurnal Sholat<br>Digital V1.1
+        </div>
     </div>
-    
-    <div id="formSiswa">
-      <div class="form-group">
+
+    <!-- TOMBOL PILIHAN MENU ANANDA / ORANG TUA -->
+    <div class="tab-grid">
+        <button class="tab-btn active" id="btn-ananda">Menu Ananda</button>
+        <button class="tab-btn" id="btn-ortu" onclick="alert('Menu Orang Tua dalam pengembangan!')">Orang Tua</button>
+    </div>
+
+    <!-- FORM INPUT LOGIN -->
+    <div class="form-group">
         <label>Nama Lengkap Ananda:</label>
-        <input type="text" class="minecraft-input" id="namaSiswa" placeholder="Ketik nama...">
-      </div>
-      <div class="form-group">
+        <input type="text" id="input-nama" placeholder="Contoh: Fia Can">
+    </div>
+    <div class="form-group">
         <label>Kode Voucher / Password:</label>
-        <input type="password" class="minecraft-input" id="pwSiswa" placeholder="****">
-      </div>
+        <input type="password" id="input-voucher" placeholder="••••">
     </div>
 
-    <div id="formOrtu" style="display:none;">
-      <div class="form-group">
-        <label>Nama Lengkap Anak:</label>
-        <input type="text" class="minecraft-input" id="namaAnakOrtu" placeholder="Nama anak...">
-      </div>
-      <div class="form-group">
-        <label>Password Orang Tua:</label>
-        <input type="password" class="minecraft-input" id="pwOrtu" placeholder="****">
-      </div>
-    </div>
-    
-    <button class="minecraft-btn" onclick="prosesMasuk()">[ MASUK / DAFTAR ]</button>
-    
-    <div class="status-text" id="statusServer">Memeriksa data ke server...</div>
-  </div>
+    <button class="btn-submit" onclick="prosesLoginSatri()">[ MASUK / DAFTAR ]</button>
+</div>
 
-  <script>
-    var currentTab = 'santri';
-    var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+<div class="loader-overlay" id="loading">
+    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Memeriksa Kode Voucher...</p></div>
+</div>
 
-    function setTab(tab) {
-      currentTab = tab;
-      if (tab === 'santri') {
-        $('#btnSantri').addClass('active');
-        $('#btnOrtu').removeClass('active');
-        $('#formSiswa').show();
-        $('#formOrtu').hide();
-      } else {
-        $('#btnOrtu').addClass('active');
-        $('#btnSantri').removeClass('active');
-        $('#formOrtu').show();
-        $('#formSiswa').hide();
-      }
+<script>
+    const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
+
+    $(document).ready(function() {
+        // MENJALANKAN JAM DIGITAL REALTIME
+        setInterval(function() {
+            let d = new Date();
+            let hari = d.toLocaleDateString('id-ID', { weekday: 'short' });
+            let tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            
+            $("#live-date").text(hari + ", " + tgl);
+            $("#live-clock").text(d.toLocaleTimeString('id-ID', { hour12: false }));
+        }, 1000);
+    });
+
+    function prosesLoginSatri() {
+        let nama = $("#input-nama").val().trim();
+        let voucher = $("#input-voucher").val().trim();
+
+        if(!nama || !voucher) return alert("Nama dan Kode Voucher wajib diisi!");
+
+        $("#loading").css("display", "flex");
+
+        $.ajax({
+            url: URL_DATABASE, type: "GET",
+            data: { action: "loginSiswa", nama: nama, voucher: voucher },
+            dataType: "jsonp", jsonp: "callback",
+            success: function(res) {
+                $("#loading").hide();
+                if(res.status === "success") {
+                    localStorage.setItem("user_siswa", JSON.stringify({ nama: nama, voucher: voucher }));
+                    window.location.href = "sholat.html";
+                } else {
+                    alert("Gagal Masuk: " + res.message);
+                }
+            },
+            error: function() { $("#loading").hide(); alert("Koneksi gagal atau voucher salah."); }
+        });
     }
-
-    function prosesMasuk() {
-      var nama, password, action;
-      
-      if (currentTab === 'santri') {
-        nama = $('#namaSiswa').val().trim();
-        password = $('#pwSiswa').val().trim();
-        action = "loginSiswa";
-      } else {
-        nama = $('#namaAnakOrtu').val().trim();
-        password = $('#pwOrtu').val().trim();
-        action = "loginOrtu";
-      }
-
-      if (nama === "" || password === "") {
-        alert("Waduh! Nama dan Password tidak boleh kosong!");
-        return;
-      }
-
-      $('#statusServer').text("Menghubungkan ke server Minecraft...").fadeIn();
-      $('.minecraft-btn').prop('disabled', true).css('opacity', '0.6');
-
-      // Mengirimkan data asli ke Google Apps Script Anda menggunakan Ajax JSONP asli
-      $.ajax({
-        url: WEB_APP_URL,
-        type: "GET",
-        dataType: "jsonp",
-        data: {
-          action: action,
-          nama: nama,
-          namaAnak: nama,
-          password: password,
-          passwordOrtu: password,
-          isBaru: "true"
-        },
-        success: function(response) {
-          $('#statusServer').fadeOut();
-          $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
-
-         if (response.status === "success") {
-        if (currentTab === 'santri') {
-          alert("Selamat! Masuk Jurnal Berhasil!");
-          
-          // 1. Simpan sesi Santri agar tidak ditolak oleh sholat.html
-          localStorage.setItem("user_siswa", JSON.stringify({ nama: response.nama }));
-          
-          window.location.href = "sholat.html?nama=" + encodeURIComponent(response.nama);
-        } else {
-          alert("Login Orang Tua Berhasil!");
-          
-          // 2. SEKARANG SUDAH DITAMBAHKAN role: "ortu" agar tidak mental lagi
-          localStorage.setItem("user_ortu", JSON.stringify({ 
-            namaAnak: response.namaAnak, 
-            role: "ortu" 
-          }));
-          
-          window.location.href = "dashboard_ortu.html?namaAnak=" + encodeURIComponent(response.namaAnak);
-        }
-      } else {
-        alert("Gagal: " + response.message);
-      }
-    },
-    error: function() {
-      $('#statusServer').fadeOut();
-      $('.minecraft-btn').prop('disabled', false).css('opacity', '1');
-      alert("Gagal terhubung! Periksa koneksi atau URL Apps Script Anda.");
-    }
-  });
-}
 </script>
-
 </body>
 </html>
