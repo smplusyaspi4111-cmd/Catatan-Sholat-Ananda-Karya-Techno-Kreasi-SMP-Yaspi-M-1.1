@@ -188,7 +188,7 @@
 
         $.ajax({
             url: URL_DATABASE, type: "GET",
-            data: { action: "loginSiswa", nama: nama, voucher: voucher },
+            data: { action: "loginSiswa", nama: nama, password: voucher },
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading").hide();
