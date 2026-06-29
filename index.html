@@ -129,7 +129,6 @@
 <body>
 
 <div class="login-container">
-    <!-- GRID HEADER SESUAI GAMBAR PAINT BAPAK -->
     <div class="header-grid">
         <div class="time-box">
             <span id="live-date">Memuat...</span>
@@ -140,19 +139,17 @@
         </div>
     </div>
 
-    <!-- TOMBOL PILIHAN MENU ANANDA / ORANG TUA -->
     <div class="tab-grid">
         <button class="tab-btn active" id="btn-ananda">Menu Ananda</button>
         <button class="tab-btn" id="btn-ortu">Orang Tua</button>
     </div>
 
-    <!-- FORM INPUT LOGIN -->
     <div class="form-group">
-        <label>Nama Lengkap Ananda:</label>
+        <label for="input-nama">Nama Lengkap Ananda:</label>
         <input type="text" id="input-nama" placeholder="Contoh: Fia Can">
     </div>
     <div class="form-group">
-        <label>Kode Voucher / Password:</label>
+        <label for="input-voucher">Kode Voucher / Password:</label>
         <input type="password" id="input-voucher" placeholder="••••">
     </div>
 
@@ -160,14 +157,15 @@
 </div>
 
 <div class="loader-overlay" id="loading">
-    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Memeriksa Kode Voucher...</p></div>
+    <div style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Memproses...</p></div>
 </div>
+
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
-    let modeLogin = "ananda"; // Mode default saat aplikasi dibuka
+    let modeLogin = "ananda"; 
 
     $(document).ready(function() {
-        // MENJALANKAN JAM DIGITAL REALTIME
+        // JAM DIGITAL REALTIME
         setInterval(function() {
             let d = new Date();
             let hari = d.toLocaleDateString('id-ID', { weekday: 'short' });
@@ -177,13 +175,12 @@
             $("#live-clock").text(d.toLocaleTimeString('id-ID', { hour12: false }));
         }, 1000);
 
-        // EVENT INTERAKSI TOMBOL MENU TAB
+        // INTERAKSI TOMBOL MENU TAB
         $("#btn-ananda").click(function() {
             modeLogin = "ananda";
             $(this).addClass("active");
             $("#btn-ortu").removeClass("active");
             
-            // Ubah Label teks Form untuk Ananda
             $("label[for='input-nama']").text("Nama Lengkap Ananda:");
             $("label[for='input-voucher']").text("Kode Voucher / Password:");
             $("#input-nama").attr("placeholder", "Contoh: Fia Can");
@@ -194,7 +191,6 @@
             $(this).addClass("active");
             $("#btn-ananda").removeClass("active");
             
-            // Ubah Label teks Form untuk Orang Tua
             $("label[for='input-nama']").text("Nama Lengkap Ananda:");
             $("label[for='input-voucher']").text("Password Orang Tua:");
             $("#input-nama").attr("placeholder", "Contoh: Fia Can");
@@ -210,7 +206,7 @@
         $("#loading").css("display", "flex");
 
         if (modeLogin === "ananda") {
-            // LOGIN SISI ANANDA
+            // LOGIN ANANDA
             $.ajax({
                 url: URL_DATABASE, type: "GET",
                 data: { action: "loginSiswa", nama: nama, password: voucher },
@@ -227,7 +223,7 @@
                 error: function() { $("#loading").hide(); alert("Koneksi gagal ke server database."); }
             });
         } else {
-            // LOGIN SISI ORANG TUA (Menghubungkan ke action loginOrtu di Apps Script Bapak)
+            // LOGIN ORANG TUA
             $.ajax({
                 url: URL_DATABASE, type: "GET",
                 data: { action: "loginOrtu", namaAnak: nama, passwordOrtu: voucher },
@@ -236,7 +232,6 @@
                     $("#loading").hide();
                     if(res.status === "success") {
                         localStorage.setItem("user_ortu", JSON.stringify({ namaAnak: nama }));
-                        // Mengarah ke file dashboard_ortu.html yang sudah Bapak buat di GitHub!
                         window.location.href = "dashboard_ortu.html"; 
                     } else {
                         alert("Gagal Masuk Ortu: " + res.message);
@@ -247,3 +242,5 @@
         }
     }
 </script>
+</body>
+</html>
