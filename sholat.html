@@ -13,9 +13,9 @@
         .btn-keluar { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .main-container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         
-        /* --- KARTU USER DENGAN KAMERA MANDIRI --- */
+        /* --- KARTU USER --- */
         .welcome-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
-        .profile-frame { width: 90px; height: 90px; border-radius: 10px; border: 3px solid #dc3545; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #f1f3f5; flex-shrink: 0; cursor: pointer; position: relative; }
+        .profile-frame { width: 90px; height: 90px; border-radius: 10px; border: 3px solid #0f5132; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #f1f3f5; flex-shrink: 0; cursor: pointer; position: relative; }
         .profile-frame img { width: 100%; height: 100%; object-fit: cover; }
         .profile-frame .overlay-pilih { display: none; position: absolute; background: rgba(0,0,0,0.5); color: white; width: 100%; height: 100%; text-align: center; font-size: 10px; flex-direction: column; justify-content: center; align-items: center; }
         .profile-frame:hover .overlay-pilih { display: flex; }
@@ -26,20 +26,27 @@
         .score-badge { font-size: 12px; font-weight: bold; color: var(--primary); background: #e8f5e9; padding: 4px 10px; border-radius: 20px; display: inline-block; }
 
         /* KARTU SHOLAT */
-        .sholat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid var(--secondary); position: relative; }
+        .sholat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 5px solid var(--secondary); position: relative; transition: all 0.3s ease; }
         .sholat-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* FORMAT GRID TOMBOL WARNA-WARNI */
+        /* THEMA WARNA TOMBOL STATIS (TAMPIL BERWARNA LANGSUNG SEJAK AWAL) */
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .opt-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; color: #333; }
+        .opt-btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease; }
         
-        .opt-btn.btn-uzur.selected { background: #ff92c2 !important; color: white !important; border-color: #ff92c2 !important; }
-        .opt-btn.btn-awal.selected { background: #198754 !important; color: white !important; border-color: #198754 !important; }
-        .opt-btn.btn-tengah.selected { background: #ffeb3b !important; color: #333 !important; border-color: #ffeb3b !important; }
-        .opt-btn.btn-akhir.selected { background: #dc3545 !important; color: white !important; border-color: #dc3545 !important; }
+        /* Pewarnaan Kelas Statis Mengikuti Jenis Kelamin & Target Waktu */
+        .opt-btn.btn-p-uzur { background: #ff92c2; color: white; }
+        .opt-btn.btn-l-jamaah { background: #0d6efd; color: white; }
+        .opt-btn.btn-awal { background: #198754; color: white; }
+        .opt-btn.btn-tengah { background: #ffc107; color: #212529; }
+        .opt-btn.btn-akhir { background: #dc3545; color: white; }
         
-        .opt-btn:disabled { opacity: 0.3; cursor: not-allowed; background: #f0f0f0; color: #aaa; }
-        .opt-btn.selected:disabled { opacity: 1 !important; }
+        /* Logika Redup Otomatis Jika Ada Tombol Lain yang Dipilih */
+        .options-grid.has-selection .opt-btn { opacity: 0.25; transform: scale(0.96); }
+        .options-grid.has-selection .opt-btn.selected { opacity: 1 !important; transform: scale(1.02); box-shadow: 0 0 10px rgba(0,0,0,0.25); border: 2px solid #fff; }
+        
+        /* Desain Saat Tombol Dikunci/Disabled */
+        .opt-btn:disabled { cursor: not-allowed; }
+        .options-grid:not(.has-selection) .opt-btn:disabled { opacity: 0.65; filter: grayscale(40%); }
 
         .btn-submit-utama { width: 100%; padding: 14px; background: #198754; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .badge-belum-waktunya { color: #dc3545; font-size: 12px; font-weight: bold; background: #f8d7da; padding: 4px 8px; border-radius: 5px; }
@@ -90,7 +97,6 @@
     let jadwalApiMedan = {}; 
     let jenisKelaminSiswa = "L";
 
-    // Peta Nama API ke Nama Indonesia untuk Tampilan Screen
     const INDO_NAME = { "Fajr": "Subuh", "Dhuhr": "Zuhur", "Asr": "Asar", "Maghrib": "Magrib", "Isya": "Isya" };
 
     $(document).ready(function() {
@@ -101,11 +107,10 @@
         muatJadwalSholatMedanAPI();
     });
 
-    // FUNGSI API JADWAL SHOLAT MEDAN OTOMATIS
+    // MENGGUNAKAN METHOD 20 (MABIMS / KEMENAG RI) AGAR REALTIME KOTA MEDAN PAS KETUK
     function muatJadwalSholatMedanAPI() {
         $("#loading-siswa").css("display", "flex");
-        // Memanggil API Aladhan berdasarkan koordinat/kota Medan
-        $.getJSON("https://api.aladhan.com/v1/timingsByCity?city=Medan&country=Indonesia&method=2", function(data) {
+        $.getJSON("https://api.aladhan.com/v1/timingsByCity?city=Medan&country=Indonesia&method=20", function(data) {
             if(data && data.data.timings) {
                 jadwalApiMedan = data.data.timings;
                 ambilRiwayatHariIni();
@@ -141,9 +146,8 @@
             dataType: "jsonp", jsonp: "callback",
             success: function(res) {
                 $("#loading-siswa").hide();
-                if(res.gender) { jenisKelaminSiswa = res.gender; }
+                if(res.gender) { jenisKelaminSiswa = res.gender.toUpperCase(); }
                 if(res.dataSholat) {
-                    // Sinkronisasi data nama sholat dari database lama Bapak
                     dataPilihanSholat = { "Fajr": res.dataSholat.Subuh||0, "Dhuhr": res.dataSholat.Zuhur||0, "Asr": res.dataSholat.Asar||0, "Maghrib": res.dataSholat.Magrib||0, "Isya": res.dataSholat.Isya||0 };
                     dataTerbacaDariServer = { ...dataPilihanSholat };
                 }
@@ -168,7 +172,7 @@
         let IsP = (jenisKelaminSiswa === "P");
 
         ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isya"].forEach(w => {
-            let jamMasuk = jadwalApiMedan[w]; // Jam Ambil Realtime dari API
+            let jamMasuk = jadwalApiMedan[w]; 
             let v = dataPilihanSholat[w] || 0;
             let nilaiAsliServer = dataTerbacaDariServer[w] || 0;
             
@@ -180,18 +184,22 @@
                               (sudahWaktunya ? `<span class="badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>` : 
                               `<span class="badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`);
 
+            // Menentukan penanda apakah baris grid ini memiliki tombol aktif terpilih
+            let hasSelectionClass = (v > 0) ? "has-selection" : "";
+
             html += `
                 <div class="sholat-card" style="${sudahTerisiDiServer ? 'border-left-color:#6c757d;' : (!sudahWaktunya ? 'border-left-color:#dc3545;' : '')}">
                     <div class="sholat-title">
-                        <!-- MENAMPILKAN JAM REALTIME NYA DI SINI -->
                         <span><i class="far fa-clock"></i> ${INDO_NAME[w]} - ${jamMasuk || '--:--'}</span>
                         ${statusBadge}
                     </div>
-                    <div class="options-grid">
-                        <button ${disabledAttr} class="opt-btn btn-uzur ${v===20?'selected':''}" onclick="pilih('${w}',20)">${IsP?'Uzur / Haid (+20)':'Berjamaah (+20)'}</button>
-                        <button ${disabledAttr} class="opt-btn btn-awal ${v===15?'selected':''}" onclick="pilih('${w}',15)">Awal Waktu (+15)</button>
-                        <button ${disabledAttr} class="opt-btn btn-tengah ${v===10?'selected':''}" onclick="pilih('${w}',10)">Tengah Waktu (+10)</button>
-                        <button ${disabledAttr} class="opt-btn btn-akhir ${v===5?'selected':''}" onclick="pilih('${w}',5)">Akhir Waktu (+5)</button>
+                    <div class="options-grid ${hasSelectionClass}">
+                        <button ${disabledAttr} class="opt-btn ${IsP ? 'btn-p-uzur' : 'btn-l-jamaah'} ${v===20?'selected':''}" onclick="pilih('${w}',20)">
+                            ${IsP ? '<i class="fas fa-venus-marat"></i> Uzur / Haid (+20)' : '<i class="fas fa-users"></i> Berjamaah (+20)'}
+                        </button>
+                        <button ${disabledAttr} class="opt-btn btn-awal ${v===15?'selected':''}" onclick="pilih('${w}',15)"><i class="fas fa-bolt"></i> Awal Waktu (+15)</button>
+                        <button ${disabledAttr} class="opt-btn btn-tengah ${v===10?'selected':''}" onclick="pilih('${w}',10)"><i class="fas fa-hourglass-half"></i> Tengah Waktu (+10)</button>
+                        <button ${disabledAttr} class="opt-btn btn-akhir ${v===5?'selected':''}" onclick="pilih('${w}',5)"><i class="fas fa-running"></i> Akhir Waktu (+5)</button>
                     </div>
                 </div>`;
         });
@@ -209,8 +217,6 @@
         $("#loading-siswa").css("display", "flex");
         let d = new Date();
         let tglKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-
-        // Mengembalikan nama kunci ke format lama Sheets Bapak sebelum dikirim
         let dataKirim = { "Subuh": dataPilihanSholat.Fajr, "Zuhur": dataPilihanSholat.Dhuhr, "Asar": dataPilihanSholat.Asr, "Magrib": dataPilihanSholat.Maghrib, "Isya": dataPilihanSholat.Isya };
 
         $.ajax({
