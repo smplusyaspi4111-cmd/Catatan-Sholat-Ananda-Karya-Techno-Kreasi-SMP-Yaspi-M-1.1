@@ -187,9 +187,9 @@
             dataType: "jsonp",
             jsonp: "callback",
             189     success: function(res) {
-190         $("#loader-ortu").hide();
-191         if (res.status === "success") {
-192             $("#total-skor-display").html(res.akumulasiSkor + ' <span style="font-size: 16px;">Poin</span>');
+         $("#loader-ortu").hide();
+         if (res.status === "success") {
+             $("#total-skor-display").html(res.akumulasiSkor + ' <span style="font-size: 16px;">Poin</span>');
                 
                 // --- SISIPKAN LOGIKA FOTO DI SINI (DI BAWAH BARIS 192) ---
                 let namaAnakTerpilih = $("#pilihan-nama-anak").val() || ""; // Menyesuaikan ID input/select nama anak di skrip Bapak
@@ -203,11 +203,11 @@
                 }
                 // ---------------------------------------------------------
 
-193             renderTabelLaporan(res.dataSholat);
-194         } else {
-195             alert(res.message);
-196         }
-197     },
+             renderTabelLaporan(res.dataSholat);
+         } else {
+             alert(res.message);
+         }
+     },
             error: function() { 
                 $("#loader-ortu").hide(); 
                 alert("Gagal memuat data. Mohon periksa kembali ketersediaan data di database."); 
