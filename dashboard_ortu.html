@@ -214,7 +214,7 @@
             let poin = dataSholat[w] || 0;
             let teksStatus = "Belum Diisi / Lewat Waktu";
             
-            // Variabel warna background default (Merah untuk belum diisi)
+            // Variabel warna background default (Merah Solid untuk belum diisi)
             let warnaBackground = "#dc3545"; 
             let warnaTeks = "#ffffff";
             
@@ -225,20 +225,20 @@
             } 
             else if (poin === 15) { 
                 teksStatus = "Awal Waktu (+15 Poin)"; 
-                warnaBackground = "#a3cfbb"; // Hijau Muda/Soft sesuai tombol Awal Waktu siswa
+                warnaBackground = "#a3cfbb"; // Hijau Muda/Soft sesuai tombol siswa
                 warnaTeks = "#0f5132";       // Teks hijau gelap agar kontras
             } 
             else if (poin === 10) { 
                 teksStatus = "Tengah Waktu (+10 Poin)"; 
-                warnaBackground = "#fff3cd"; // Kuning Soft sesuai tombol Tengah Waktu siswa
+                warnaBackground = "#fff3cd"; // Kuning Soft sesuai tombol siswa
                 warnaTeks = "#664d03";       // Teks cokelat gelap
             } 
             else if (poin === 5) { 
                 teksStatus = "Akhir Waktu (+5 Poin)"; 
-                warnaBackground = "#dc3545"; // Merah solid sesuai tombol Akhir Waktu siswa
+                warnaBackground = "#dc3545"; // Merah Solid sesuai tombol siswa
             }
             
-            // Ditambahkan !important pada background-color dan color agar CSS lama ter-overwrite
+            // PERBAIKAN UTAMA: Mengganti class="badge \${badgeKelas}" menjadi class="badge" saja
             html += `
                 <div class="item-laporan">
                     <span><b>${w}</b></span>
