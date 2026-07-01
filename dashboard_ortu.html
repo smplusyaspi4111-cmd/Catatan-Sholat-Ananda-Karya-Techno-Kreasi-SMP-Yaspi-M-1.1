@@ -50,14 +50,73 @@
         .status-awal { background: #0d6efd; }
         .status-tengah { background: #ffc107; color: #333; }
         .status-akhir { background: #6c757d; }
-        .loader { display: none; text-align: center; padding: 20px; color: var(--primary); font-weight: bold; }
-    </style>
+        .loader { display: none; text-align: center; padding: ... }
+        
+        /* --- SISIPKAN KODE CSS BARU DI SINI --- */
+        .ortu-profile-score-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 0 10px;
+        }
+        .ortu-avatar-frame {
+            width: 85px;
+            height: 85px;
+            border-radius: 12px;
+            border: 3px solid #ffffff;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background: #e9ecef;
+            flex-shrink: 0;
+        }
+        .ortu-avatar-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ortu-score-box {
+            background-color: #198754;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            text-align: center;
+            flex-grow: 1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .ortu-score-box .score-title {
+            margin: 0 0 5px 0;
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        .ortu-score-box .score-value {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .ortu-score-box .score-unit {
+            font-size: 16px;
+            font-weight: normal;
+        }    </style>
 </head>
 <body>
 
 <div class="header-banner">
     <button class="btn-keluar" onclick="logoutOrtu()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
     <p style="margin: 0;">Selamat Datang Ayah/Bunda</p>
+    <div class="ortu-profile-score-container">
+    <div class="ortu-avatar-frame">
+        <img id="ortu-foto-ananda" src="https://via.placeholder.com/100" alt="Foto Ananda">
+    </div>
+
+    <div class="ortu-score-box">
+        <p class="score-title">Total Akumulasi Skor Hari Ini</p>
+        <p class="score-value"><span id="ortu-skor-display">5</span> <span class="score-unit">Poin</span></p>
+    </div>
+</div>
     <h2 id="nama-anak-title" style="margin: 5px 0 15px 0;">Nama Anak</h2>
     <div class="skor-box" style="width: 100%; max-width: 250px; margin: 0 auto; color: #333;">
         <span style="font-size: 13px; font-weight: 600; color: #555;">Total Akumulasi Skor Hari Ini</span>
@@ -127,15 +186,28 @@
             data: { action: "ambilLaporanOrtu", namaAnak: sesiOrtu.namaAnak, tanggal: tanggalMentah },
             dataType: "jsonp",
             jsonp: "callback",
-            success: function(res) {
-                $("#loader-ortu").hide();
-                if (res.status === "success") {
-                    $("#total-skor-display").html(res.akumulasiSkor + ' <span style="font-size: 16px;">Poin</span>');
-                    renderTabelLaporan(res.dataSholat);
-                } else { 
-                    alert(res.message); 
+            189     success: function(res) {
+190         $("#loader-ortu").hide();
+191         if (res.status === "success") {
+192             $("#total-skor-display").html(res.akumulasiSkor + ' <span style="font-size: 16px;">Poin</span>');
+                
+                // --- SISIPKAN LOGIKA FOTO DI SINI (DI BAWAH BARIS 192) ---
+                let namaAnakTerpilih = $("#pilihan-nama-anak").val() || ""; // Menyesuaikan ID input/select nama anak di skrip Bapak
+                let fotoSaved = localStorage.getItem("foto_profil_" + namaAnakTerpilih);
+
+                if (fotoSaved) {
+                    $("#ortu-foto-ananda").attr("src", fotoSaved);
+                } else {
+                    // Jika belum ada foto, pakai gambar avatar default
+                    $("#ortu-foto-ananda").attr("src", "https://cdn-icons-png.flaticon.com/512/194/194938.png");
                 }
-            },
+                // ---------------------------------------------------------
+
+193             renderTabelLaporan(res.dataSholat);
+194         } else {
+195             alert(res.message);
+196         }
+197     },
             error: function() { 
                 $("#loader-ortu").hide(); 
                 alert("Gagal memuat data. Mohon periksa kembali ketersediaan data di database."); 
