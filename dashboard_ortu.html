@@ -143,6 +143,7 @@
 <script>
     const URL_DATABASE = "https://script.google.com/macros/s/AKfycbymySKegwMDiJneEe9LvyOFEuoub-HW-DHLxcAy5A1YMzhoam4_8z3k_JIXgImccu8q/exec";
     
+    // KODE YANG SEMPAT HILANG (Wajib Ada):
     let dataSesiMentah = localStorage.getItem("user_ortu");
     
     if (!dataSesiMentah) {
@@ -181,7 +182,7 @@
             success: function(res) {
                 $("#loader-ortu").hide();
                 if (res.status === "success") {
-                    // PERBAIKAN 1: Mengubah target ke ID yang benar agar tidak error macet
+                    // Update skor ke box premium orang tua
                     $("#ortu-skor-display").text(res.akumulasiSkor || 0);
                     
                     // Membaca simpanan foto ananda dari localstorage
@@ -194,7 +195,6 @@
                         $("#ortu-foto-ananda").attr("src", "https://cdn-icons-png.flaticon.com/512/194/194938.png");
                     }
 
-                    // Sekarang baris ini bisa berjalan dengan lancar tanpa terhenti error
                     renderTabelLaporan(res.dataSholat);
                 } else {
                     alert(res.message);
@@ -217,36 +217,36 @@
             let nilaiMentah = sholatData[w]; 
             let teksStatus = "Belum Diisi / Lewat Waktu";
             
-            // PERBAIKAN: Warna default jika BELUM DIISI diubah menjadi Abu-abu Lembut (#6c757d)
+            // Default warna BELUM DIISI adalah Abu-abu Lembut (#6c757d)
             let warnaBackground = "#6c757d"; 
             let warnaTeks = "#ffffff";
             
-            // Cek jika anak sudah mengisi data (data tidak kosong atau bukan 0)
-            if (nilaiMentah !== undefined && nilaiMentah !== null && nilaiMentah !== "" && nilaiMentah !==0 && nilaiMentah !== "0") {
+            // Cek jika data ada dan anak sudah mengisi
+            if (nilaiMentah !== undefined && nilaiMentah !== null && nilaiMentah !== "" && nilaiMentah !== 0 && nilaiMentah !== "0") {
                 
-                // 1. Jika anak klik Berjamaah (+20) -> Hijau Tua
+                // 1. Berjamaah (+20) -> Hijau Tua
                 if (nilaiMentah === 20 || nilaiMentah === "20" || String(nilaiMentah).toLowerCase().includes("jamaah")) {
                     teksStatus = "Berjamaah (+20 Poin)"; 
                     warnaBackground = "#198754"; 
                 } 
-                // 2. Jika anak klik Awal Waktu (+15) -> Hijau Muda Soft
+                // 2. Awal Waktu (+15) -> Hijau Muda Soft
                 else if (nilaiMentah === 15 || nilaiMentah === "15" || String(nilaiMentah).toLowerCase().includes("awal")) {
                     teksStatus = "Awal Waktu (+15 Poin)"; 
                     warnaBackground = "#a3cfbb"; 
                     warnaTeks = "#0f5132";       
                 } 
-                // 3. Jika anak klik Tengah Waktu (+10) -> Kuning Soft
+                // 3. Tengah Waktu (+10) -> Kuning Soft
                 else if (nilaiMentah === 10 || nilaiMentah === "10" || String(nilaiMentah).toLowerCase().includes("tengah")) {
                     teksStatus = "Tengah Waktu (+10 Poin)"; 
                     warnaBackground = "#fff3cd"; 
                     warnaTeks = "#664d03";       
                 } 
-                // 4. Jika anak klik Akhir Waktu (+5) -> Merah Solid (Sesuai Tombol Siswa)
+                // 4. Akhir Waktu (+5) -> Merah Solid sesuai tombol anak
                 else if (nilaiMentah === 5 || nilaiMentah === "5" || String(nilaiMentah).toLowerCase().includes("akhir")) {
                     teksStatus = "Akhir Waktu (+5 Poin)"; 
-                    warnaBackground = "#dc3545"; // Merah Solid pas saat diklik anak
+                    warnaBackground = "#dc3545"; 
                 }
-                // 5. Jika ada status Uzur / Haid
+                // 5. Uzur / Haid (+20)
                 else if (String(nilaiMentah).toLowerCase().includes("uzur") || String(nilaiMentah).toLowerCase().includes("haid")) {
                     teksStatus = "Uzur / Haid (+20 Poin)";
                     warnaBackground = "#f8d7da"; 
@@ -266,9 +266,6 @@
                 </div>
             `;
         });
-        
-        $("#box-daftar-laporan").html(html);
-    }
         
         $("#box-daftar-laporan").html(html);
     }
