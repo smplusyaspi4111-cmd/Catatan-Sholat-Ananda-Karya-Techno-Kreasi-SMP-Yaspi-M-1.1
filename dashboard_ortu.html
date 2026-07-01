@@ -211,36 +211,47 @@
         let listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
         let html = "";
         
-        // Memastikan dataSholat tidak kosong/null agar tidak error
         let sholatData = dataSholat || {};
         
         listWaktu.forEach(w => {
-            // Mengonversi ke integer/angka agar perbandingan poin (===) terbaca valid
-            let poin = parseInt(sholatData[w]) || 0;
+            // Mengambil nilai mentah dari database (bisa berupa angka poin atau teks status)
+            let nilaiMentah = sholatData[w]; 
             let teksStatus = "Belum Diisi / Lewat Waktu";
             
             // Variabel warna background default (Merah Solid)
             let warnaBackground = "#dc3545"; 
             let warnaTeks = "#ffffff";
             
-            // Logika Penyesuaian Warna Mengikuti Tombol Siswa
-            if (poin === 20) { 
-                teksStatus = "Berjamaah (+20 Poin)"; 
-                warnaBackground = "#198754"; // Hijau Tua khas Berjamaah
-            } 
-            else if (poin === 15) { 
-                teksStatus = "Awal Waktu (+15 Poin)"; 
-                warnaBackground = "#a3cfbb"; // Hijau Muda/Soft sesuai tombol siswa
-                warnaTeks = "#0f5132";       // Teks hijau gelap agar kontras
-            } 
-            else if (poin === 10) { 
-                teksStatus = "Tengah Waktu (+10 Poin)"; 
-                warnaBackground = "#fff3cd"; // Kuning Soft sesuai tombol siswa
-                warnaTeks = "#664d03";       // Teks cokelat gelap
-            } 
-            else if (poin === 5) { 
-                teksStatus = "Akhir Waktu (+5 Poin)"; 
-                warnaBackground = "#dc3545"; // Merah Solid sesuai tombol siswa
+            // Cek jika data ada dan tidak kosong
+            if (nilaiMentah !== undefined && nilaiMentah !== null && nilaiMentah !== "" && nilaiMentah !== 0 && nilaiMentah !== "0") {
+                
+                // 1. Logika untuk status Berjamaah (+20)
+                if (nilaiMentah === 20 || nilaiMentah === "20" || String(nilaiMentah).toLowerCase().includes("jamaah")) {
+                    teksStatus = "Berjamaah (+20 Poin)"; 
+                    warnaBackground = "#198754"; // Hijau Tua
+                } 
+                // 2. Logika untuk status Awal Waktu (+15)
+                else if (nilaiMentah === 15 || nilaiMentah === "15" || String(nilaiMentah).toLowerCase().includes("awal")) {
+                    teksStatus = "Awal Waktu (+15 Poin)"; 
+                    warnaBackground = "#a3cfbb"; // Hijau Soft
+                    warnaTeks = "#0f5132";       // Teks Hijau Gelap
+                } 
+                // 3. Logika untuk status Tengah Waktu (+10)
+                else if (nilaiMentah === 10 || nilaiMentah === "10" || String(nilaiMentah).toLowerCase().includes("tengah")) {
+                    teksStatus = "Tengah Waktu (+10 Poin)"; 
+                    warnaBackground = "#fff3cd"; // Kuning Soft
+                    warnaTeks = "#664d03";       // Teks Cokelat Gelap
+                } 
+                // 4. Logika untuk status Akhir Waktu (+5)
+                else if (nilaiMentah === 5 || nilaiMentah === "5" || String(nilaiMentah).toLowerCase().includes("akhir")) {
+                    teksStatus = "Akhir Waktu (+5 Poin)"; 
+                    warnaBackground = "#dc3545"; // Merah Solid sesuai tombol Akhir Waktu
+                }
+                // 5. Antisipasi jika database mengirimkan teks lain / Uzur
+                else {
+                    teksStatus = nilaiMentah;
+                    warnaBackground = "#6c757d"; // Abu-abu default netral
+                }
             }
             
             html += `
