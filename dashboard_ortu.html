@@ -213,17 +213,37 @@
         listWaktu.forEach(w => {
             let poin = dataSholat[w] || 0;
             let teksStatus = "Belum Diisi / Lewat Waktu";
-            let badgeKelas = "status-belum";
             
-            if (poin === 20) { teksStatus = "Berjamaah (+20 Poin)"; badgeKelas = "status-berjamaah"; }
-            else if (poin === 15) { teksStatus = "Awal Waktu (+15 Poin)"; badgeKelas = "status-awal"; }
-            else if (poin === 10) { teksStatus = "Tengah Waktu (+10 Poin)"; badgeKelas = "status-tengah"; }
-            else if (poin === 5) { teksStatus = "Akhir Waktu (+5 Poin)"; badgeKelas = "status-akhir"; }
+            // Variabel warna background default (Merah untuk belum diisi)
+            let warnaBackground = "#dc3545"; 
+            let warnaTeks = "#ffffff";
+            
+            // Logika Penyesuaian Warna Mengikuti Tombol yang Diklik Anak
+            if (poin === 20) { 
+                teksStatus = "Berjamaah (+20 Poin)"; 
+                warnaBackground = "#198754"; // Hijau Tua khas Berjamaah
+            } 
+            else if (poin === 15) { 
+                teksStatus = "Awal Waktu (+15 Poin)"; 
+                warnaBackground = "#a3cfbb"; // Hijau Muda/Soft sesuai tombol Awal Waktu siswa
+                warnaTeks = "#0f5132";       // Teks hijau gelap agar kontras dan mudah dibaca
+            } 
+            else if (poin === 10) { 
+                teksStatus = "Tengah Waktu (+10 Poin)"; 
+                warnaBackground = "#fff3cd"; // Kuning Soft sesuai tombol Tengah Waktu siswa
+                warnaTeks = "#664d03";       // Teks cokelat gelap agar kontras
+            } 
+            else if (poin === 5) { 
+                teksStatus = "Akhir Waktu (+5 Poin)"; 
+                warnaBackground = "#dc3545"; // Merah solid sesuai tombol Akhir Waktu siswa
+            }
             
             html += `
                 <div class="item-laporan">
                     <span><b>${w}</b></span>
-                    <span class="badge ${badgeKelas}">${teksStatus}</span>
+                    <span class="badge" style="background-color: ${warnaBackground}; color: ${warnaTeks}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block;">
+                        ${teksStatus}
+                    </span>
                 </div>
             `;
         });
