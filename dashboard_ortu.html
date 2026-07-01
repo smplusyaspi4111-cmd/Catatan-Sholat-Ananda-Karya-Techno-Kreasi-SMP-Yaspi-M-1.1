@@ -226,22 +226,23 @@
             else if (poin === 15) { 
                 teksStatus = "Awal Waktu (+15 Poin)"; 
                 warnaBackground = "#a3cfbb"; // Hijau Muda/Soft sesuai tombol Awal Waktu siswa
-                warnaTeks = "#0f5132";       // Teks hijau gelap agar kontras dan mudah dibaca
+                warnaTeks = "#0f5132";       // Teks hijau gelap agar kontras
             } 
             else if (poin === 10) { 
                 teksStatus = "Tengah Waktu (+10 Poin)"; 
                 warnaBackground = "#fff3cd"; // Kuning Soft sesuai tombol Tengah Waktu siswa
-                warnaTeks = "#664d03";       // Teks cokelat gelap agar kontras
+                warnaTeks = "#664d03";       // Teks cokelat gelap
             } 
             else if (poin === 5) { 
                 teksStatus = "Akhir Waktu (+5 Poin)"; 
                 warnaBackground = "#dc3545"; // Merah solid sesuai tombol Akhir Waktu siswa
             }
             
+            // Ditambahkan !important pada background-color dan color agar CSS lama ter-overwrite
             html += `
                 <div class="item-laporan">
                     <span><b>${w}</b></span>
-                    <span class="badge" style="background-color: ${warnaBackground}; color: ${warnaTeks}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block;">
+                    <span class="badge" style="background-color: ${warnaBackground} !important; color: ${warnaTeks} !important; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block;">
                         ${teksStatus}
                     </span>
                 </div>
