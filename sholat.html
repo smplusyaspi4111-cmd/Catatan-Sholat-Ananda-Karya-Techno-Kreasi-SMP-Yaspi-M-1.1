@@ -148,7 +148,8 @@
                 $("#loading-siswa").hide();
                 if(res.gender) { jenisKelaminSiswa = res.gender.toUpperCase(); }
                 if(res.dataSholat) {
-                    dataPilihanSholat = { "Fajr": res.dataSholat.Subuh||0, "Dhuhr": res.dataSholat.Zuhur||0, "Asr": res.dataSholat.Asar||0, "Maghrib": res.dataSholat.Magrib||0, "Isya": res.dataSholat.Isya||0 };
+                    // Diubah ke Isha agar sinkron dengan API
+                    dataPilihanSholat = { "Fajr": res.dataSholat.Subuh||0, "Dhuhr": res.dataSholat.Zuhur||0, "Asr": res.dataSholat.Asar||0, "Maghrib": res.dataSholat.Magrib||0, "Isha": res.dataSholat.Isya||0 };
                     dataTerbacaDariServer = { ...dataPilihanSholat };
                 }
                 if(res.akumulasiSkor !== undefined) { $("#skor-santri-hari-ini").text(res.akumulasiSkor); }
@@ -171,7 +172,8 @@
         let html = "";
         let IsP = (jenisKelaminSiswa === "P");
 
-        ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isya"].forEach(w => {
+        // Menggunakan Isha
+        ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach(w => {
             let jamMasuk = jadwalApiMedan[w]; 
             let v = dataPilihanSholat[w] || 0;
             let nilaiAsliServer = dataTerbacaDariServer[w] || 0;
@@ -184,7 +186,6 @@
                               (sudahWaktunya ? `<span class="badge-siap"><i class="fas fa-check-circle"></i> Siap Isi</span>` : 
                               `<span class="badge-belum-waktunya"><i class="fas fa-hourglass-start"></i> Belum Waktu</span>`);
 
-            // Menentukan penanda apakah baris grid ini memiliki tombol aktif terpilih
             let hasSelectionClass = (v > 0) ? "has-selection" : "";
 
             html += `
@@ -195,7 +196,7 @@
                     </div>
                     <div class="options-grid ${hasSelectionClass}">
                         <button ${disabledAttr} class="opt-btn ${IsP ? 'btn-p-uzur' : 'btn-l-jamaah'} ${v===20?'selected':''}" onclick="pilih('${w}',20)">
-                            ${IsP ? '<i class="fas fa-venus-marat"></i> Uzur / Haid (+20)' : '<i class="fas fa-users"></i> Berjamaah (+20)'}
+                            ${IsP ? '<i class="fas fa-venus-mars"></i> Uzur / Haid (+20)' : '<i class="fas fa-users"></i> Berjamaah (+20)'}
                         </button>
                         <button ${disabledAttr} class="opt-btn btn-awal ${v===15?'selected':''}" onclick="pilih('${w}',15)"><i class="fas fa-bolt"></i> Awal Waktu (+15)</button>
                         <button ${disabledAttr} class="opt-btn btn-tengah ${v===10?'selected':''}" onclick="pilih('${w}',10)"><i class="fas fa-hourglass-half"></i> Tengah Waktu (+10)</button>
@@ -217,7 +218,8 @@
         $("#loading-siswa").css("display", "flex");
         let d = new Date();
         let tglKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        let dataKirim = { "Subuh": dataPilihanSholat.Fajr, "Zuhur": dataPilihanSholat.Dhuhr, "Asar": dataPilihanSholat.Asr, "Magrib": dataPilihanSholat.Maghrib, "Isya": dataPilihanSholat.Isya };
+        // Tetap dikirim ke Sheets dengan nama "Isya" agar database Bapak tidak rusak
+        let dataKirim = { "Subuh": dataPilihanSholat.Fajr, "Zuhur": dataPilihanSholat.Dhuhr, "Asar": dataPilihanSholat.Asr, "Magrib": dataPilihanSholat.Maghrib, "Isya": dataPilihanSholat.Isha };
 
         $.ajax({
             url: URL_DATABASE, type: "GET",
@@ -231,7 +233,6 @@
             error: function() { $("#loading-siswa").hide(); alert("Gagal menyambungkan ke server."); }
         });
     }
-
     function logoutSiswa() { localStorage.removeItem("user_siswa"); window.location.href = "index.html"; }
 </script>
 </body>
