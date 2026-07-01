@@ -26,37 +26,52 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             text-align: center;
         }
-        /* --- KOTAK HEADER DUA KOLOM (JAM & JUDUL) --- */
+        /* --- KOTAK HEADER DUA KOLOM DIBUAT PREMIUM --- */
         .header-grid {
-            display: grid;
-            grid-template-columns: 140px 1fr;
+            display: flex;
+            flex-direction: column; /* Membuat susunan jam di atas, judul di bawah */
             gap: 15px;
             align-items: center;
             margin-bottom: 25px;
         }
         .time-box {
-            border: 2px solid #8B5A2B; /* Kotak Cokelat */
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            color: #d4a373;
-            text-align: left;
-            line-height: 1.4;
+            background: #050505; /* Hitam pekat khas panel LED */
+            border: 1px solid #222;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #ffb703; /* Warna oranye/kuning LED redup */
+            text-align: center; /* Rata tengah */
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 2px;
+            
+            /* Efek Tiga Dimensi (3D Shadow) & Glow Panel */
+            box-shadow: 
+                inset 0 2px 5px rgba(0,0,0,0.8), 
+                inset 0 -2px 5px rgba(255,255,255,0.1),
+                0 4px 10px rgba(0,0,0,0.9),
+                0 0 5px rgba(255, 183, 3, 0.2); 
         }
         .time-box #live-clock {
+            font-family: 'Courier New', Courier, monospace; /* Font monospace kaku kyk LED */
             font-weight: bold;
-            font-size: 13px;
-            color: #fff;
+            font-size: 24px; /* Ukuran jam diperbesar biar gagah */
+            color: #ff3333; /* Merah neon menyala */
             display: block;
-            margin-top: 3px;
+            margin-top: 5px;
+            letter-spacing: 3px;
+            /* Efek cahaya berpendar pada teks LED merah */
+            text-shadow: 0 0 8px rgba(255, 51, 51, 0.7), 0 0 2px rgba(255, 51, 51, 0.5);
         }
         .title-app {
             color: #FFFF00; /* Kuning Retro */
             font-size: 18px;
             font-weight: bold;
-            text-align: left;
+            text-align: center; /* Diposisikan rata tengah agar serasi dengan jam */
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            width: 100%;
         }
         
         /* TAB BUTTONS */
@@ -165,11 +180,11 @@
     let modeLogin = "ananda"; 
 
     $(document).ready(function() {
-        // JAM DIGITAL REALTIME
+        // JAM DIGITAL REALTIME DENGAN TAHUN LENGKAP
         setInterval(function() {
             let d = new Date();
-            let hari = d.toLocaleDateString('id-ID', { weekday: 'short' });
-            let tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            let hari = d.toLocaleDateString('id-ID', { weekday: 'long' });
+            let tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
             
             $("#live-date").text(hari + ", " + tgl);
             $("#live-clock").text(d.toLocaleTimeString('id-ID', { hour12: false }));
