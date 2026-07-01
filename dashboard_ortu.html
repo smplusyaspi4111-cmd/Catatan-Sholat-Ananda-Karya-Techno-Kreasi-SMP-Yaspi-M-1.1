@@ -181,7 +181,7 @@
             success: function(res) {
                 $("#loader-ortu").hide();
                 if (res.status === "success") {
-                    // Update skor real-time ke box premium baru
+                    // PERBAIKAN 1: Mengubah target ke ID yang benar agar tidak error macet
                     $("#ortu-skor-display").text(res.akumulasiSkor || 0);
                     
                     // Membaca simpanan foto ananda dari localstorage
@@ -194,6 +194,7 @@
                         $("#ortu-foto-ananda").attr("src", "https://cdn-icons-png.flaticon.com/512/194/194938.png");
                     }
 
+                    // Sekarang baris ini bisa berjalan dengan lancar tanpa terhenti error
                     renderTabelLaporan(res.dataSholat);
                 } else {
                     alert(res.message);
@@ -210,15 +211,19 @@
         let listWaktu = ["Subuh", "Zuhur", "Asar", "Magrib", "Isya"];
         let html = "";
         
+        // Memastikan dataSholat tidak kosong/null agar tidak error
+        let sholatData = dataSholat || {};
+        
         listWaktu.forEach(w => {
-            let poin = dataSholat[w] || 0;
+            // Mengonversi ke integer/angka agar perbandingan poin (===) terbaca valid
+            let poin = parseInt(sholatData[w]) || 0;
             let teksStatus = "Belum Diisi / Lewat Waktu";
             
-            // Variabel warna background default (Merah Solid untuk belum diisi)
+            // Variabel warna background default (Merah Solid)
             let warnaBackground = "#dc3545"; 
             let warnaTeks = "#ffffff";
             
-            // Logika Penyesuaian Warna Mengikuti Tombol yang Diklik Anak
+            // Logika Penyesuaian Warna Mengikuti Tombol Siswa
             if (poin === 20) { 
                 teksStatus = "Berjamaah (+20 Poin)"; 
                 warnaBackground = "#198754"; // Hijau Tua khas Berjamaah
@@ -238,7 +243,6 @@
                 warnaBackground = "#dc3545"; // Merah Solid sesuai tombol siswa
             }
             
-            // PERBAIKAN UTAMA: Mengganti class="badge \${badgeKelas}" menjadi class="badge" saja
             html += `
                 <div class="item-laporan">
                     <span><b>${w}</b></span>
